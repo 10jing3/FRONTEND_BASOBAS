@@ -11,6 +11,7 @@ const SignUp = () => {
   const [message, setMessage] = useState(null);
   const navigate = useNavigate();
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -19,6 +20,7 @@ const SignUp = () => {
     }));
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage(null);
@@ -29,7 +31,7 @@ const SignUp = () => {
         formData
       );
       setMessage(response.data.message);
-      navigate("/"); // Redirect to the Home page
+      navigate("/signin"); // Redirect to the Sign In page
     } catch (error) {
       setMessage(
         error.response?.data?.message ||

@@ -5,10 +5,10 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   server: {
     proxy: {
-      '/api': { // Use '/api' instead of 'api'
-        target: 'http://localhost:3000',
-        changeOrigin: true, // Ensure the origin of the host header is changed to the target URL
-        secure: false,
+      '/api': {
+        target: 'http://localhost:5000', // Backend server running on port 5000
+        changeOrigin: true, // Modifies the origin header to match the target
+        secure: false, // For HTTP connections (not HTTPS)
       },
     },
   },

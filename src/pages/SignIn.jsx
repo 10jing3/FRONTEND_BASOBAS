@@ -11,7 +11,7 @@ const SignIn = () => {
   const [message, setMessage] = useState(null);
   const navigate = useNavigate();
 
-  // Handle input field changes
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -26,17 +26,13 @@ const SignIn = () => {
     setMessage(null);
 
     try {
-      // Send data to the backend
       const response = await axios.post(
         "http://localhost:5000/api/auth/signin",
         formData
       );
-
-      // Show success message and redirect to Home
       setMessage(response.data.message);
-      navigate("/"); // Redirect to Home page
+      navigate("/"); // Redirect to the Home page
     } catch (error) {
-      // Show error message
       setMessage(
         error.response?.data?.message ||
           "Invalid credentials. Please try again."
@@ -70,8 +66,6 @@ const SignIn = () => {
             {message}
           </p>
         )}
-
-        {/* Login Form */}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="name" className="block text-gray-700">
@@ -111,10 +105,8 @@ const SignIn = () => {
           </button>
         </form>
 
-        {/* Divider */}
         <div className="my-6 text-center text-gray-500">OR</div>
 
-        {/* Google Sign-In */}
         <button
           onClick={handleGoogleSignIn}
           className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition duration-300"
