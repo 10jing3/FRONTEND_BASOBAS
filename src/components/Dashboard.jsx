@@ -3,7 +3,7 @@ import React from "react";
 const Dashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("token"); // Clear token on logout
-    window.location.href = "/login"; // Redirect to login
+    window.location.href = "/"; // Redirect to login
   };
 
   return (
