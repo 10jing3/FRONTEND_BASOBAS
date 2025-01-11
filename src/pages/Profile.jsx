@@ -131,7 +131,7 @@ export default function Profile() {
           className="h-24 w-24 self-center cursor-pointer rounded-full object-cover mt-2"
           onClick={() => fileRef.current.click()}
         /> */}
-        {/* <p className="text-sm self-center">
+        <p className="text-sm self-center">
           {imageError ? (
             <span className="text-red-700">
               Error uploading image (file size must be less than 2 MB)
@@ -143,7 +143,7 @@ export default function Profile() {
           ) : (
             ""
           )}
-        </p> */}
+        </p>
         <input
           defaultValue={currentUser.username}
           type="text"
