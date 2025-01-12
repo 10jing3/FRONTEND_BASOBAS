@@ -1,15 +1,15 @@
 import React from "react";
 import Footer from "./Footer";
+import img from "../assets/kathmandu.jpg";
 
 const About = () => {
   return (
     <div className="font-sans bg-gray-100 min-h-screen">
       {/* Hero Section */}
       <header
-        className="relative h-[300px] bg-cover bg-center flex items-center justify-center"
+        className="relative h-[500px] bg-cover bg-center flex items-center justify-center"
         style={{
-          backgroundImage:
-            "url('https://t3.ftcdn.net/jpg/01/79/49/56/360_F_179495677_LMiOo97wzUMwkOcVaow1sgf39iYyMTTX.jpg')",
+          backgroundImage: `url(${img})`,
         }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>

@@ -64,7 +64,7 @@ const Home = () => {
     <div className="font-sans">
       {/* Header Section */}
       <header
-        className="relative h-[400px] bg-cover bg-center"
+        className="relative h-[700px] bg-cover bg-center"
         style={{ backgroundImage: `url(${img})` }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
@@ -99,7 +99,7 @@ const Home = () => {
 
       {/* Popular Hostels Section */}
       <section className="p-6">
-        <h2 className="text-2xl font-bold mb-4 text-center">Popular Hostels</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Popular Rooms</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {hostels.map((hostel) => (
             <div
@@ -114,7 +114,7 @@ const Home = () => {
               <img
                 src={hostel.image}
                 alt={hostel.title}
-                className="w-full h-40 object-cover"
+                className="w-full h-70 object-cover"
               />
               <div className="p-4">
                 <h3 className="text-lg font-bold text-gray-800">
