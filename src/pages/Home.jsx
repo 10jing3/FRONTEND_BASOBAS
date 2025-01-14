@@ -1,38 +1,129 @@
 import React, { useState } from "react";
 import img from "../assets/chitwan.jpg";
 import pkrimg from "../assets/pokhara.jpg";
-import Footer from "./Footer";
+import "swiper/swiper-bundle.css";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const Home = () => {
   const [search, setSearch] = useState({ location: "", budget: "" });
+  const [selectedCity, setSelectedCity] = useState(null);
 
-  const hostels = [
+  const cities = [
     {
-      id: 1,
-      title: "Spacious Apartment",
-      price: "$500/month",
-      location: "Kathmandu",
-      rating: 4.5,
-      featured: true,
-      image: img,
+      name: "Kathmandu",
+      places: [
+        {
+          id: 1,
+          title: "Spacious Apartment",
+          price: "$500/month",
+          location: "Kathmandu",
+          rating: 4.5,
+          image: img,
+        },
+        {
+          id: 4,
+          title: "Modern Studio Apartment",
+          price: "$400/month",
+          location: "Kathmandu",
+          rating: 4.7,
+          image: "https://via.placeholder.com/400x300", // Replace with actual image
+        },
+        {
+          id: 5,
+          title: "Shared Room in City Center",
+          price: "$250/month",
+          location: "Kathmandu",
+          rating: 4.3,
+          image: "https://via.placeholder.com/400x300", // Replace with actual image
+        },
+      ],
     },
     {
-      id: 2,
-      title: "Cozy Room",
-      price: "$300/month",
-      location: "Pokhara",
-      rating: 4.8,
-      featured: false,
-      image: pkrimg,
+      name: "Pokhara",
+      places: [
+        {
+          id: 2,
+          title: "Cozy Room",
+          price: "$300/month",
+          location: "Pokhara",
+          rating: 4.8,
+          image: pkrimg,
+        },
+        {
+          id: 6,
+          title: "Lake View Apartment",
+          price: "$700/month",
+          location: "Pokhara",
+          rating: 4.9,
+          image: "https://via.placeholder.com/400x300", // Replace with actual image
+        },
+        {
+          id: 7,
+          title: "Affordable Single Room",
+          price: "$200/month",
+          location: "Pokhara",
+          rating: 4.4,
+          image: "https://via.placeholder.com/400x300", // Replace with actual image
+        },
+      ],
     },
     {
-      id: 3,
-      title: "Luxury Suite",
-      price: "$800/month",
-      location: "Lalitpur",
-      rating: 4.2,
-      featured: true,
-      image: img,
+      name: "Lalitpur",
+      places: [
+        {
+          id: 3,
+          title: "Luxury Suite",
+          price: "$800/month",
+          location: "Lalitpur",
+          rating: 4.2,
+          image: img,
+        },
+        {
+          id: 8,
+          title: "Budget-Friendly Apartment",
+          price: "$350/month",
+          location: "Lalitpur",
+          rating: 4.6,
+          image: "https://via.placeholder.com/400x300", // Replace with actual image
+        },
+        {
+          id: 9,
+          title: "Elegant Condo",
+          price: "$900/month",
+          location: "Lalitpur",
+          rating: 4.7,
+          image: "https://via.placeholder.com/400x300", // Replace with actual image
+        },
+      ],
+    },
+    {
+      name: "Bhaktapur",
+      places: [
+        {
+          id: 10,
+          title: "Traditional Heritage Apartment",
+          price: "$600/month",
+          location: "Bhaktapur",
+          rating: 4.5,
+          image: "https://via.placeholder.com/400x300", // Replace with actual image
+        },
+        {
+          id: 11,
+          title: "Family-Friendly House",
+          price: "$700/month",
+          location: "Bhaktapur",
+          rating: 4.6,
+          image: "https://via.placeholder.com/400x300", // Replace with actual image
+        },
+        {
+          id: 12,
+          title: "Single Room in Suburb",
+          price: "$250/month",
+          location: "Bhaktapur",
+          rating: 4.2,
+          image: "https://via.placeholder.com/400x300", // Replace with actual image
+        },
+      ],
     },
   ];
 
@@ -40,23 +131,23 @@ const Home = () => {
     {
       id: 1,
       name: "John Doe",
-      review: "“Rent with Confidence, Trust with Ease.”",
+      review: "Rent with Confidence, Trust with Ease.",
       rating: "★★★★★",
-      image: img,
+      image: img, // Replace with actual image URL
     },
     {
       id: 2,
       name: "Jane Smith",
-      review: "“Excellent service and great options!”",
+      review: "Excellent service and great options!",
       rating: "★★★★★",
-      image: pkrimg,
+      image: pkrimg, // Replace with actual image URL
     },
     {
       id: 3,
       name: "Alex Johnson",
-      review: "“Highly recommend for hassle-free rentals.”",
+      review: "Highly recommend for hassle-free rentals.",
       rating: "★★★★☆",
-      image: img,
+      image: img, // Replace with actual image URL
     },
   ];
 
@@ -97,73 +188,151 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Popular Hostels Section */}
-      <section className="p-6">
-        <h2 className="text-2xl font-bold mb-4 text-center">Popular Rooms</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {hostels.map((hostel) => (
-            <div
-              key={hostel.id}
-              className="border rounded-lg shadow-md overflow-hidden bg-white hover:shadow-lg transform transition-transform hover:scale-105 relative"
-            >
-              {hostel.featured && (
-                <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
-                  Featured
+      <div>
+        {/* Popular Cities Section */}
+        <section className="p-6 bg-white">
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Popular Cities
+          </h2>
+          <div className="flex flex-wrap justify-center gap-4">
+            {cities.map((city) => (
+              <button
+                key={city.name}
+                onClick={() => setSelectedCity(city)}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+              >
+                {city.name}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Display Selected City */}
+        {selectedCity && (
+          <section className="p-6">
+            <h2 className="text-2xl font-bold mb-4 text-center">
+              Places in {selectedCity.name}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {selectedCity.places.map((place) => (
+                <div
+                  key={place.id}
+                  className="border rounded-lg shadow-md overflow-hidden bg-white hover:shadow-lg transform transition-transform hover:scale-105"
+                >
+                  <img
+                    src={place.image}
+                    alt={place.title}
+                    className="w-full h-56 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold text-gray-800">
+                      {place.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-2">
+                      {place.location}
+                    </p>
+                    <p className="text-green-500 font-bold mt-2">
+                      {place.price}
+                    </p>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <span className="text-yellow-500 text-sm font-medium">
+                        ★ {place.rating}
+                      </span>
+                    </div>
+                    <button className="mt-3 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                      View Details
+                    </button>
+                  </div>
                 </div>
-              )}
-              <img
-                src={hostel.image}
-                alt={hostel.title}
-                className="w-full h-70 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-bold text-gray-800">
-                  {hostel.title}
-                </h3>
-                <p className="text-sm text-gray-500 mt-2">{hostel.location}</p>
-                <p className="text-green-500 font-bold mt-2">{hostel.price}</p>
-                <div className="flex items-center space-x-2 mt-2">
-                  <span className="text-yellow-500 text-sm font-medium">
-                    ★ {hostel.rating}
-                  </span>
-                  <p className="text-gray-500 text-sm">(100+ Reviews)</p>
-                </div>
-                <button className="mt-3 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
-                  View Details
-                </button>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </section>
+        )}
+      </div>
+
+      <section className="p-6 bg-white">
+        <h2 className="text-2xl font-bold mb-4 text-center">Popular Rooms</h2>
+        <Swiper
+          spaceBetween={16}
+          slidesPerView={1}
+          breakpoints={{
+            640: {
+              slidesPerView: 1,
+            },
+            768: {
+              slidesPerView: 2,
+            },
+            1024: {
+              slidesPerView: 3,
+            },
+          }}
+          loop={true} // Enables infinite scrolling
+          navigation={true} // Enables navigation buttons
+          pagination={{ clickable: true }} // Enables pagination
+          className="mySwiper"
+        >
+          {cities
+            .flatMap((city) => city.places)
+            .map((place) => (
+              <SwiperSlide key={place.id}>
+                <div className="border rounded-lg shadow-md overflow-hidden bg-white hover:shadow-lg transform transition-transform hover:scale-105 relative">
+                  <img
+                    src={place.image}
+                    alt={place.title}
+                    className="w-full h-56 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold text-gray-800">
+                      {place.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-2">
+                      {place.location}
+                    </p>
+                    <p className="text-green-500 font-bold mt-2">
+                      {place.price}
+                    </p>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <span className="text-yellow-500 text-sm font-medium">
+                        ★ {place.rating}
+                      </span>
+                    </div>
+                    <button className="mt-3 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+        </Swiper>
       </section>
 
       {/* Client Reviews Section */}
       <section className="p-6 bg-gray-100">
-        <h2 className="text-2xl font-bold mb-4 text-center">Client Reviews</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          What Our Clients Say
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="border rounded-lg p-4 shadow-md bg-white hover:shadow-lg"
+              className="border rounded-lg p-4 shadow-md bg-white hover:shadow-lg transition-transform transform hover:scale-105"
             >
-              <p className="text-sm text-gray-600">{review.review}</p>
-              <div className="mt-4 flex items-center space-x-2">
+              <p className="italic text-gray-600 mb-4">“{review.review}”</p>
+              <div className="flex items-center space-x-4">
                 <img
                   src={review.image}
                   alt={review.name}
-                  className="w-8 h-8 rounded-full object-cover"
+                  className="w-12 h-12 rounded-full object-cover"
                 />
                 <div>
-                  <p className="text-sm font-semibold">{review.name}</p>
-                  <div className="text-yellow-400 text-sm">{review.rating}</div>
+                  <p className="font-semibold text-gray-800">{review.name}</p>
+                  <p className="text-yellow-500 text-sm">{review.rating}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };

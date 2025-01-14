@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -54,13 +55,17 @@ const Footer = () => {
         <div className="col-span-1">
           <h3 className="font-semibold text-lg mb-4">About Us</h3>
           <ul className="space-y-2 text-sm">
-            {["About us", "Announcements", "News", "Contact", "Features"].map(
-              (item, index) => (
-                <li key={index} className="hover:text-green-500 cursor-pointer">
-                  {item}
-                </li>
-              )
-            )}
+            {[
+              { name: "About us", path: "/about" },
+              { name: "Announcements", path: "/about" },
+              { name: "News", path: "/news" },
+              { name: "Contact", path: "/about" },
+              { name: "Features", path: "/about" },
+            ].map((item, index) => (
+              <li key={index} className="hover:text-green-500 cursor-pointer">
+                <Link to={item.path}>{item.name}</Link>
+              </li>
+            ))}
           </ul>
         </div>
 

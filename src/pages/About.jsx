@@ -1,5 +1,5 @@
 import React from "react";
-import Footer from "./Footer";
+import Footer from "../components/Footer";
 import img from "../assets/kathmandu.jpg";
 
 const About = () => {
@@ -160,8 +160,6 @@ const About = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };
