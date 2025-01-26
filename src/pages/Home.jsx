@@ -3,6 +3,7 @@ import img from "../assets/chitwan.jpg";
 import pkrimg from "../assets/pokhara.jpg";
 import "swiper/swiper-bundle.css";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [search, setSearch] = useState({ location: "", budget: "" });
@@ -26,7 +27,7 @@ const Home = () => {
           price: "$400/month",
           location: "Kathmandu",
           rating: 4.7,
-          image: "https://via.placeholder.com/400x300", // Replace with actual image
+          image: img, // Replace with actual image
         },
         {
           id: 5,
@@ -34,7 +35,7 @@ const Home = () => {
           price: "$250/month",
           location: "Kathmandu",
           rating: 4.3,
-          image: "https://via.placeholder.com/400x300", // Replace with actual image
+          image: img, // Replace with actual image
         },
       ],
     },
@@ -55,7 +56,7 @@ const Home = () => {
           price: "$700/month",
           location: "Pokhara",
           rating: 4.9,
-          image: "https://via.placeholder.com/400x300", // Replace with actual image
+          image: img, // Replace with actual image
         },
         {
           id: 7,
@@ -63,7 +64,7 @@ const Home = () => {
           price: "$200/month",
           location: "Pokhara",
           rating: 4.4,
-          image: "https://via.placeholder.com/400x300", // Replace with actual image
+          image: pkrimg, // Replace with actual image
         },
       ],
     },
@@ -84,7 +85,7 @@ const Home = () => {
           price: "$350/month",
           location: "Lalitpur",
           rating: 4.6,
-          image: "https://via.placeholder.com/400x300", // Replace with actual image
+          image: img, // Replace with actual image
         },
         {
           id: 9,
@@ -92,7 +93,7 @@ const Home = () => {
           price: "$900/month",
           location: "Lalitpur",
           rating: 4.7,
-          image: "https://via.placeholder.com/400x300", // Replace with actual image
+          image: img, // Replace with actual image
         },
       ],
     },
@@ -105,7 +106,7 @@ const Home = () => {
           price: "$600/month",
           location: "Bhaktapur",
           rating: 4.5,
-          image: "https://via.placeholder.com/400x300", // Replace with actual image
+          image: img, // Replace with actual image
         },
         {
           id: 11,
@@ -113,7 +114,7 @@ const Home = () => {
           price: "$700/month",
           location: "Bhaktapur",
           rating: 4.6,
-          image: "https://via.placeholder.com/400x300", // Replace with actual image
+          image: pkrimg, // Replace with actual image
         },
         {
           id: 12,
@@ -121,7 +122,7 @@ const Home = () => {
           price: "$250/month",
           location: "Bhaktapur",
           rating: 4.2,
-          image: "https://via.placeholder.com/400x300", // Replace with actual image
+          image: pkrimg, // Replace with actual image
         },
       ],
     },
@@ -182,9 +183,12 @@ const Home = () => {
             onChange={(e) => setSearch({ ...search, budget: e.target.value })}
             className="flex-1 p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow placeholder-gray-500 text-gray-700"
           />
-          <button className="w-full md:w-auto px-8 py-4 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all">
+          <Link
+            className="w-full md:w-auto px-8 py-4 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all"
+            to="/room"
+          >
             Search
-          </button>
+          </Link>
         </div>
       </section>
 
