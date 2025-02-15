@@ -10,16 +10,21 @@ import News from "./pages/News";
 import Footer from "./components/Footer";
 import Room from "./pages/Room";
 import RoomDetail from "./pages/RoomDetail";
+import Dashboard from "./pages/admin/Dashboard";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import SingleRoom from "./pages/Room/RoomDisplay";
 
 const AppContent = () => {
   const location = useLocation();
 
   // Specify the routes where Footer should be excluded
-  const noFooterRoutes = ["/sign-in", "/sign-up", "/profile"];
+  const noFooterRoutes = ["/sign-in", "/sign-up", "/profile", "/dashboard"];
+  const noHeaderRoutes = [""];
 
   return (
     <>
-      <Header />
+      {!noHeaderRoutes.includes(location.pathname) && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -28,12 +33,16 @@ const AppContent = () => {
         <Route path="/news" element={<News />} />
         <Route path="/room" element={<Room />} />
         <Route path="/roomdetail" element={<RoomDetail />} />
+        <Route path="/room/:roomId" element={<SingleRoom />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Route>
       </Routes>
       {/* Conditionally render Footer */}
       {!noFooterRoutes.includes(location.pathname) && <Footer />}
+
+      {/* Conditionally render Header */}
     </>
   );
 };
