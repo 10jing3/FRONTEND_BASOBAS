@@ -41,7 +41,7 @@ export default function Header() {
             </li>
             <li>
               <Link
-                to="/profile"
+                to="/dashboard"
                 className="flex items-center gap-2 hover:text-green-500 transition-colors focus:outline-none focus:ring-2 focus:ring-green-300"
               >
                 {currentUser ? (

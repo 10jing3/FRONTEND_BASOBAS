@@ -1,19 +1,23 @@
 import { FaHome, FaUsers, FaBuilding, FaCog } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export default function SideNav({ setActiveSection }) {
   return (
     <div className="fixed inset-y-0 left-0 w-64 bg-gray-800 text-green-600 p-6">
-      <h1 className="text-2xl font-bold mb-8">Room Rental Admin</h1>
-      <nav>
+      <Link to="/" className="text-2xl font-bold mb-8">
+        Room Rental
+      </Link>
+      <nav className=" mt-5">
         <ul className="space-y-4">
           <li>
-            <button
-              onClick={() => setActiveSection("dashboard")}
-              className="flex items-center space-x-2 hover:text-gray-400 w-full text-left"
+            <Link
+              to="/dashboard"
+              className="  flex items-center space-x-2 hover:text-gray-400 w-full
+            text-left"
             >
               <FaHome className="h-6 w-6" />
               <span>Dashboard</span>
-            </button>
+            </Link>
           </li>
           <li>
             <button

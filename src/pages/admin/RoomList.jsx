@@ -7,7 +7,18 @@ import Carousel from "../../components/Carousel";
 export default function RoomList() {
   const queryClient = useQueryClient();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [roomToDelete, setRoomToDelete] = useState(null);
+  const [editedRoomData, setEditedRoomData] = useState({
+    name: "",
+    price: "",
+    roomCategory: "",
+    contactNumber: "",
+    location: "",
+    size: "",
+    amenities: "",
+    description: "",
+  });
 
   // Fetch rooms data using React Query
   const {
@@ -49,6 +60,53 @@ export default function RoomList() {
     setShowDeleteModal(false);
   };
 
+  // Handler for opening the Edit Room Modal
+  const handleEdit = (roomData) => {
+    setEditedRoomData({
+      name: roomData.name,
+      price: roomData.price,
+      roomCategory: roomData.roomCategory,
+      contactNumber: roomData.contactNumber,
+      location: roomData.location,
+      size: roomData.size,
+      amenities: roomData.amenities,
+      description: roomData.description,
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle form field changes for editing room
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditedRoomData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Cancel edit action
+  const cancelEdit = () => {
+    setShowEditModal(false);
+  };
+
+  // Confirm edit action
+  const confirmEdit = async () => {
+    try {
+      const response = await axios.put(
+        `/api/rooms/${editedRoomData._id}`,
+        editedRoomData
+      );
+      if (response.status === 200) {
+        alert("Room updated successfully!");
+        setShowEditModal(false);
+        queryClient.invalidateQueries(["rooms"]);
+      }
+    } catch (error) {
+      console.error("Error updating room:", error);
+      alert("Error updating room. Please try again.");
+    }
+  };
+
   if (isLoading) return <p>Loading rooms...</p>;
   if (error) return <p>Error loading rooms</p>;
 
@@ -63,23 +121,31 @@ export default function RoomList() {
           >
             <div className="flex justify-between items-center">
               <h4 className="text-lg font-bold">{room.name}</h4>
-              <button
-                onClick={() => handleDelete(room._id)}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 flex items-center space-x-2"
-              >
-                <FaTrash className="h-4 w-4" />
-                <span>Delete</span>
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleEdit(room)}
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center space-x-2"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(room._id)}
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 flex items-center space-x-2"
+                >
+                  <FaTrash className="h-4 w-4" />
+                  <span>Delete</span>
+                </button>
+              </div>
             </div>
 
             {/* Carousel Component */}
             <Carousel images={room.roomImages} />
 
             <p className="text-gray-700">
-              Price: <span className="font-semibold">${room.price}/night</span>
+              <span className="font-semibold">${room.price}</span>
             </p>
             <p className="text-gray-700">
-              Size: <span className="font-semibold">{room.size}</span>
+              <span className="font-semibold">{room.location}</span>
             </p>
             <p className="text-gray-700 flex items-center">
               Amenities:{" "}
@@ -133,6 +199,60 @@ export default function RoomList() {
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               >
                 Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Room Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h4 className="text-lg font-semibold">Edit Room</h4>
+            <div className="mt-4">
+              <label className="block">Name:</label>
+              <input
+                type="text"
+                name="name"
+                value={editedRoomData.name}
+                onChange={handleEditChange}
+                className="w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+            <div className="mt-4">
+              <label className="block">Price:</label>
+              <input
+                type="text"
+                name="price"
+                value={editedRoomData.price}
+                onChange={handleEditChange}
+                className="w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+            <div className="mt-4">
+              <label className="block">Location:</label>
+              <input
+                type="text"
+                name="location"
+                value={editedRoomData.location}
+                onChange={handleEditChange}
+                className="w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+            {/* Add other fields like roomCategory, contactNumber, etc., in a similar manner */}
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={cancelEdit}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmEdit}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Save
               </button>
             </div>
           </div>

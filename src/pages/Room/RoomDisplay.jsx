@@ -14,8 +14,8 @@ const SingleRoom = () => {
   useEffect(() => {
     const fetchRoom = async () => {
       try {
-        const response = await axios.get(`/api/room/rooms/${roomId}`);
-        setRoom(response.data);
+        const response = await axios.get(`/api/room/rooms/${roomId}`); // Update the URL here to match the route in the backend
+        setRoom(response.data); // Assuming backend returns the room data in the `data` field
       } catch (err) {
         setError("Failed to fetch room details. Please try again later.");
       } finally {
@@ -47,7 +47,8 @@ const SingleRoom = () => {
     );
   };
 
-  if (loading) return loading;
+  if (loading)
+    return <p className="text-center text-gray-600 mt-8">Loading...</p>;
   if (error) return <p className="text-center text-red-600 mt-8">{error}</p>;
   if (!room)
     return <p className="text-center text-gray-600 mt-8">Room not found.</p>;
@@ -138,7 +139,6 @@ const SingleRoom = () => {
       </div>
 
       {/* Image Modal */}
-
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center">
           <button
