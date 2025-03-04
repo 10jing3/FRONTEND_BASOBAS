@@ -10,14 +10,13 @@ export default function SideNav({ setActiveSection }) {
       <nav className=" mt-5">
         <ul className="space-y-4">
           <li>
-            <Link
-              to="/dashboard"
+            <button
               className="  flex items-center space-x-2 hover:text-gray-400 w-full
             text-left"
             >
               <FaHome className="h-6 w-6" />
               <span>Dashboard</span>
-            </Link>
+            </button>
           </li>
           <li>
             <button
