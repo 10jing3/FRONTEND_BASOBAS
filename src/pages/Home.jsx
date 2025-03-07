@@ -247,15 +247,16 @@ const Home = () => {
           </Swiper>
         </div>
       </section>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-3">
-        {isLoading ? (
-          <p>Loading...</p> // Show a loading message while data is being fetched
-        ) : error ? (
-          <p>Error loading rooms. Please try again later.</p> // Show an error message if the request fails
-        ) : (
-          rooms?.map((room) => <RoomCard key={room._id} room={room} />)
-        )}
+      <div className="container mx-auto py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {isLoading ? (
+            <p>Loading...</p> // Show a loading message while data is being fetched
+          ) : error ? (
+            <p>Error loading rooms. Please try again later.</p> // Show an error message if the request fails
+          ) : (
+            rooms?.map((room) => <RoomCard key={room._id} room={room} />)
+          )}
+        </div>
       </div>
     </div>
   );
