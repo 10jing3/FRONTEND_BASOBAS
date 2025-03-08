@@ -8,8 +8,6 @@ import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import News from "./pages/News";
 import Footer from "./components/Footer";
-import Room from "./pages/Room";
-import RoomDetail from "./pages/RoomDetail";
 import Dashboard from "./pages/admin/Dashboard";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -32,8 +30,6 @@ const AppContent = () => {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/news" element={<News />} />
-        <Route path="/room" element={<Room />} />
-        <Route path="/roomdetail" element={<RoomDetail />} />
         <Route path="/room/:roomId" element={<SingleRoom />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
