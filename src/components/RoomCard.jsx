@@ -17,7 +17,9 @@ const RoomCard = ({ room }) => {
       <div className="p-3 space-y-1">
         <h3 className="text-sm font-semibold text-gray-800">{name}</h3>
         <p className="text-xs text-gray-600">{location}</p>
-        <p className="text-sm font-semibold text-green-600">${price} / night</p>
+        <p className="text-sm font-semibold text-green-600">
+          Rs {price} / night
+        </p>
 
         <button
           className="mt-1 w-auto p-2  bg-green-600 text-white text-xs font-medium rounded-md transition-all hover:bg-green-700"
