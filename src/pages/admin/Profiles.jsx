@@ -7,6 +7,7 @@ import {
   FaSave,
   FaTimes,
   FaTrash,
+  FaSignOutAlt, // Add the sign-out icon
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -269,6 +270,16 @@ export default function Profiles() {
           className="bg-red-600 text-white px-5 py-2 rounded-md hover:bg-red-700 flex items-center space-x-2 transition"
         >
           <FaTrash /> <span>Delete Account</span>
+        </button>
+      </div>
+
+      {/* Sign Out Button */}
+      <div className="mt-6 flex justify-center">
+        <button
+          onClick={handleSignOut}
+          className="bg-gray-600 text-white px-5 py-2 rounded-md hover:bg-gray-700 flex items-center space-x-2 transition"
+        >
+          <FaSignOutAlt /> <span>Sign Out</span>
         </button>
       </div>
 

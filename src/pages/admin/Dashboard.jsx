@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import SideNav from "./SideNav";
-
 import RoomList from "./RoomList";
-
 import Users from "../../components/Users";
 import Profiles from "./Profiles";
 import RoomForm from "./RoomForm";
+import { useSelector } from "react-redux";
 
 export default function Dashboard() {
+  const user = useSelector((state) => state.user.currentUser);
+  console.log("user", user._id);
   const [rooms, setRooms] = useState([]);
   const [activeSection, setActiveSection] = useState("dashboard"); // Track active section
 
