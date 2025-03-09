@@ -13,6 +13,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import SingleRoom from "./pages/Room/RoomDisplay";
 import RoomEditForm from "./pages/admin/RoomFormEdit";
+import VirtualRoom from "./pages/Room/VirtualRoom";
 
 const AppContent = () => {
   const location = useLocation();
@@ -30,6 +31,7 @@ const AppContent = () => {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/news" element={<News />} />
+        <Route path="/vr-room" element={<VirtualRoom />} />
         <Route path="/room/:roomId" element={<SingleRoom />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />

@@ -25,7 +25,8 @@
     "react-slick": "^0.30.3",
     "redux-persist": "^6.0.0",
     "slick-carousel": "^1.8.1",
-    "swiper": "^11.2.1"
+    "swiper": "^11.2.1",
+    "three": "^0.174.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
