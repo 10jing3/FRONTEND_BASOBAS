@@ -14,6 +14,8 @@ import "slick-carousel/slick/slick-theme.css";
 import SingleRoom from "./pages/Room/RoomDisplay";
 import RoomEditForm from "./pages/admin/RoomFormEdit";
 import VirtualRoom from "./pages/Room/VirtualRoom";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 const AppContent = () => {
   const location = useLocation();
@@ -31,6 +33,8 @@ const AppContent = () => {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/news" element={<News />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/vr-room" element={<VirtualRoom />} />
         <Route path="/room/:roomId" element={<SingleRoom />} />
         <Route element={<PrivateRoute />}>
