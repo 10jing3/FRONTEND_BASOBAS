@@ -140,41 +140,41 @@ const Home = () => {
     <div className="font-sans">
       {/* Header Section */}
       <header
-        className="relative h-[700px] bg-cover bg-center"
+        className="relative h-[700px] bg-cover bg-center flex items-center justify-center"
         style={{ backgroundImage: `url(${img})` }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <h1 className="text-white text-4xl md:text-5xl font-bold">
+        <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center p-4 text-center">
+          <h1 className="text-white text-4xl md:text-5xl font-bold mb-6">
             Let’s find you a <span className="text-green-500">home!</span>
           </h1>
+
+          {/* Search Section Inside Header */}
+          <div className="max-w-3xl w-full flex flex-col md:flex-row items-center bg-white bg-opacity-90 p-6 rounded-xl shadow-lg space-y-4 md:space-y-0 md:space-x-4">
+            <input
+              type="text"
+              placeholder="Enter Location (e.g., Kathmandu)"
+              value={search.location}
+              onChange={(e) =>
+                setSearch({ ...search, location: e.target.value })
+              }
+              className="flex-1 p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow placeholder-gray-500 text-gray-700"
+            />
+            <input
+              type="number"
+              placeholder="Max Budget (e.g., 500)"
+              value={search.budget}
+              onChange={(e) => setSearch({ ...search, budget: e.target.value })}
+              className="flex-1 p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow placeholder-gray-500 text-gray-700"
+            />
+            <Link
+              className="px-8 py-4 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all"
+              to="/room"
+            >
+              Search
+            </Link>
+          </div>
         </div>
       </header>
-
-      {/* Search Section */}
-      <section className="p-8 bg-gray-100">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
-          <input
-            type="text"
-            placeholder="Enter Location (e.g., Kathmandu)"
-            value={search.location}
-            onChange={(e) => setSearch({ ...search, location: e.target.value })}
-            className="flex-1 p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow placeholder-gray-500 text-gray-700"
-          />
-          <input
-            type="number"
-            placeholder="Max Budget (e.g., 500)"
-            value={search.budget}
-            onChange={(e) => setSearch({ ...search, budget: e.target.value })}
-            className="flex-1 p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow placeholder-gray-500 text-gray-700"
-          />
-          <Link
-            className="w-full md:w-auto px-8 py-4 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all"
-            to="/room"
-          >
-            Search
-          </Link>
-        </div>
-      </section>
 
       {/* Popular Cities Section */}
       <section className="p-6 bg-white">

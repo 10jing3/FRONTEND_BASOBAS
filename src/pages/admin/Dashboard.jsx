@@ -26,7 +26,6 @@ export default function Dashboard() {
         return (
           <>
             <RoomForm />
-            <RoomList rooms={rooms} />
           </>
         );
       case "rooms":
@@ -48,8 +47,8 @@ export default function Dashboard() {
       <SideNav setActiveSection={setActiveSection} />
 
       {/* Main Content */}
-      <div className="ml-64 flex-1 p-8">
-        <main className="mt-16 space-y-8">{renderSection()}</main>
+      <div className="ml-64 flex-1 p-5">
+        <main className="mt-4 space-y-8">{renderSection()}</main>
       </div>
     </div>
   );
