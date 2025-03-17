@@ -36,40 +36,14 @@ function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-blue-600 text-white p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        </div>
-      </header>
+    <div className="flex">
+      {/* Sidebar without "dashboard" */}
+      <SideNav setActiveSection={setActiveSection} />
 
-      <main className="container mx-auto py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-white shadow-md rounded-md p-4">
-            <h2 className="text-lg font-semibold mb-2">Users</h2>
-            <p>Manage user accounts and roles.</p>
-            <a href="/admin/users" className="text-blue-500 hover:underline">
-              View Users
-            </a>
-          </div>
-
-          <div className="bg-white shadow-md rounded-md p-4">
-            <h2 className="text-lg font-semibold mb-2">Listings</h2>
-            <p>Approve or reject property listings.</p>
-            <a href="/admin/listings" className="text-blue-500 hover:underline">
-              View Listings
-            </a>
-          </div>
-
-          <div className="bg-white shadow-md rounded-md p-4">
-            <h2 className="text-lg font-semibold mb-2">Payments</h2>
-            <p>View and manage payment transactions.</p>
-            <a href="/admin/payments" className="text-blue-500 hover:underline">
-              View Payments
-            </a>
-          </div>
-        </div>
-      </main>
+      {/* Main Content */}
+      <div className="ml-64 flex-1 p-8">
+        <main className="mt-16 space-y-8">{renderSection()}</main>
+      </div>
     </div>
   );
 }
