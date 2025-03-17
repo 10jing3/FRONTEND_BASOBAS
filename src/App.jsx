@@ -21,8 +21,15 @@ const AppContent = () => {
   const location = useLocation();
 
   // Specify the routes where Footer should be excluded
-  const noFooterRoutes = ["/sign-in", "/sign-up", "/profile", "/dashboard"];
-  const noHeaderRoutes = [""];
+  const noFooterRoutes = [
+    "/sign-in",
+    "/sign-up",
+    "/profile",
+    "/dashboard",
+    "/admin/dashboard",
+    "/dashboard",
+  ];
+  const noHeaderRoutes = ["/admin/dashboard", "/dashboard"];
 
   return (
     <>
