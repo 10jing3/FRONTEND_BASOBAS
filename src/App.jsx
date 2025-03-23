@@ -1,3 +1,4 @@
+import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -16,6 +17,7 @@ import RoomEditForm from "./pages/admin/RoomFormEdit";
 import VirtualRoom from "./pages/Room/VirtualRoom";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminRoute from "./components/AdminRoute";
 
 const AppContent = () => {
   const location = useLocation();
@@ -28,6 +30,7 @@ const AppContent = () => {
     "/dashboard",
     "/admin/dashboard",
     "/dashboard",
+    "/admin/login",
   ];
   const noHeaderRoutes = ["/admin/dashboard", "/dashboard"];
 
@@ -40,8 +43,10 @@ const AppContent = () => {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/news" element={<News />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Route>
         <Route path="/vr-room" element={<VirtualRoom />} />
         <Route path="/room/:roomId" element={<SingleRoom />} />
         <Route element={<PrivateRoute />}>
