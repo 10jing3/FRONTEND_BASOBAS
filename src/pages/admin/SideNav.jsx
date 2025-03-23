@@ -66,6 +66,15 @@ export default function SideNav({ setActiveSection }) {
               <span>Profile</span>
             </button>
           </li>
+          <li>
+            <button
+              onClick={() => setActiveSection("RoomMate")}
+              className="flex items-center space-x-2 hover:text-gray-400 w-full text-left"
+            >
+              <FaCog className="h-6 w-6" />
+              <span>RoomMate</span>
+            </button>
+          </li>
         </ul>
       </nav>
     </div>
