@@ -1,35 +1,40 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   signInStart,
   signInSuccess,
   signInFailure,
 } from "../redux/user/userSlice";
-import { useDispatch, useSelector } from "react-redux";
 import OAuth from "../components/OAuth";
 
 export default function SignIn() {
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const { loading, error } = useSelector((state) => state.user);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Handle input changes
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.id]: e.target.value,
+    }));
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (!formData.email || !formData.password) {
-      alert("Please fill in all fields.");
+      dispatch(signInFailure({ message: "Please fill in all fields." }));
       return;
     }
 
     try {
       dispatch(signInStart());
+
       const res = await fetch(`/api/auth/signin`, {
         method: "POST",
         headers: {
@@ -37,11 +42,18 @@ export default function SignIn() {
         },
         body: JSON.stringify(formData),
       });
+
       const data = await res.json();
-      if (data.success === false) {
-        dispatch(signInFailure(data));
+      console.log("API Response:", data); // Debugging
+
+      if (!res.ok) {
+        const errorMessage =
+          data.message || "Invalid credentials. Please try again.";
+        dispatch(signInFailure({ message: errorMessage }));
+        setFormData((prev) => ({ ...prev, password: "" })); // Clear password field on failure
         return;
       }
+
       dispatch(signInSuccess(data));
       navigate("/");
     } catch (error) {
@@ -58,6 +70,7 @@ export default function SignIn() {
           placeholder="Email"
           id="email"
           className="bg-slate-100 p-3 rounded-lg"
+          value={formData.email}
           onChange={handleChange}
         />
         <input
@@ -65,6 +78,7 @@ export default function SignIn() {
           placeholder="Password"
           id="password"
           className="bg-slate-100 p-3 rounded-lg"
+          value={formData.password}
           onChange={handleChange}
         />
         <button
@@ -76,14 +90,12 @@ export default function SignIn() {
         <OAuth />
       </form>
       <div className="flex gap-2 mt-5">
-        <p>Don't Have an account?</p>
+        <p>Don't have an account?</p>
         <Link to="/sign-up">
           <span className="text-blue-500">Sign up</span>
         </Link>
       </div>
-      <p className="text-red-700 mt-5">
-        {error ? error.message || "Unable to sign in. Please try again." : ""}
-      </p>
+      {error && <p className="text-red-700 mt-5">{error.message}</p>}
     </div>
   );
 }
