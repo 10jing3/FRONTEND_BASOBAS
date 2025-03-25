@@ -5,6 +5,7 @@ import Users from "../../components/Users";
 import Profiles from "./Profiles";
 import RoomForm from "./RoomForm";
 import { useSelector } from "react-redux";
+import RoomMate from "./RoomMate";
 
 export default function Dashboard() {
   const user = useSelector((state) => state.user.currentUser);
@@ -34,6 +35,8 @@ export default function Dashboard() {
         return <Users />;
       case "profile":
         return <Profiles />;
+      case "RoomMate":
+        return <RoomMate />;
       default:
         return (
           <h2 className="text-xl font-bold">Welcome to the Admin Panel</h2>
