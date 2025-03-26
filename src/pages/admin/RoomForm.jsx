@@ -1,26 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
-const AMENITIES = [
-  "WiFi",
-  "Air Conditioning",
-  "Pool",
-  "Gym",
-  "Breakfast",
-  "Parking",
-  "Spa",
-  "Jacuzzi",
-  "Restaurant",
-  "Bar",
-  "Room Service",
-  "Airport Shuttle",
-  "Childcare",
-  "Laundry",
-  "Business Center",
-  "Pet Friendly",
-  "Beachfront",
-];
-
 const LocationInput = ({ query, suggestions, onChange, onSelect }) => (
   <div className="mb-6">
     <label
@@ -54,29 +34,6 @@ const LocationInput = ({ query, suggestions, onChange, onSelect }) => (
   </div>
 );
 
-const AmenityCheckboxes = ({ amenities, onChange }) => (
-  <div className="mb-6">
-    <label className="block text-lg font-semibold text-gray-800">
-      Amenities
-    </label>
-    <div className="flex flex-wrap gap-6 mt-2">
-      {AMENITIES.map((amenity) => (
-        <label key={amenity} className="inline-flex items-center text-gray-700">
-          <input
-            type="checkbox"
-            value={amenity}
-            checked={amenities.includes(amenity)}
-            onChange={onChange}
-            className="mr-2 border-green-400 rounded-lg focus:ring-green-500"
-            aria-label={amenity}
-          />
-          {amenity}
-        </label>
-      ))}
-    </div>
-  </div>
-);
-
 const RoomForm = () => {
   const user = useSelector((state) => state.user.currentUser);
   console.log("user_id", user._id);
@@ -88,6 +45,7 @@ const RoomForm = () => {
     amenities: [],
     description: "",
     roomImages: [],
+    vrImages: [],
     coordinates: { lat: null, lng: null },
     owner: user._id,
   });
@@ -141,6 +99,12 @@ const RoomForm = () => {
     setFormData({ ...formData, roomImages: newRoomImages });
     setImagePreviews(newRoomImages.map((file) => URL.createObjectURL(file)));
   };
+  const handleVRFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newVRImages = [...formData.vrImages, ...files];
+    setFormData({ ...formData, vrImages: newVRImages });
+    setImagePreviews(newVRImages.map((file) => URL.createObjectURL(file)));
+  };
 
   const handleAmenityChange = (e) => {
     const { value, checked } = e.target;
@@ -169,6 +133,9 @@ const RoomForm = () => {
     formData.roomImages.forEach((file) => {
       data.append("roomImages", file);
     });
+    formData.vrImages.forEach((file) => {
+      data.append("vrImages", file);
+    });
 
     try {
       const response = await fetch("/api/room/upload", {
@@ -186,6 +153,7 @@ const RoomForm = () => {
           amenities: [],
           description: "",
           roomImages: [],
+          vrImages: [],
         });
         setImagePreviews([]);
         setQuery("");
@@ -278,10 +246,28 @@ const RoomForm = () => {
           />
         </div>
 
-        <AmenityCheckboxes
-          amenities={formData.amenities}
-          onChange={handleAmenityChange}
-        />
+        <div className="mb-6">
+          <label
+            className="block text-lg font-semibold text-gray-800"
+            htmlFor="amenities"
+          >
+            Amenities (comma separated)
+          </label>
+          <textarea
+            id="amenities"
+            name="amenities"
+            value={formData.amenities} // Convert array to string
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                amenities: e.target.value.split(", "),
+              })
+            } // Convert string to array
+            className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            placeholder="E.g., WiFi, Parking, Air Conditioning"
+            required
+          />
+        </div>
 
         <div className="mb-6">
           <label
@@ -312,6 +298,23 @@ const RoomForm = () => {
             id="roomImages"
             name="roomImages"
             onChange={handleFileChange}
+            multiple
+            className="mt-2 block w-full text-sm text-green-600 bg-green-50 border border-green-300 hover:bg-green-100 rounded-lg file:px-4 file:py-3 file:rounded-lg"
+            required
+          />
+        </div>
+        <div className="mb-6">
+          <label
+            className="block text-lg font-semibold text-gray-800"
+            htmlFor="roomImages"
+          >
+            VRRoom Images
+          </label>
+          <input
+            type="file"
+            id="vrImages"
+            name="vrImages"
+            onChange={handleVRFileChange}
             multiple
             className="mt-2 block w-full text-sm text-green-600 bg-green-50 border border-green-300 hover:bg-green-100 rounded-lg file:px-4 file:py-3 file:rounded-lg"
             required

@@ -2,26 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 
-const AMENITIES = [
-  "WiFi",
-  "Air Conditioning",
-  "Pool",
-  "Gym",
-  "Breakfast",
-  "Parking",
-  "Spa",
-  "Jacuzzi",
-  "Restaurant",
-  "Bar",
-  "Room Service",
-  "Airport Shuttle",
-  "Childcare",
-  "Laundry",
-  "Business Center",
-  "Pet Friendly",
-  "Beachfront",
-];
-
 const RoomEditForm = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
@@ -31,7 +11,7 @@ const RoomEditForm = () => {
     name: "",
     price: "",
     size: "",
-    amenities: [],
+    amenities: "", // changed from array to string
     description: "",
     roomImages: [],
     coordinates: { lat: null, lng: null },
@@ -54,7 +34,7 @@ const RoomEditForm = () => {
             name: result.name,
             price: result.price,
             size: result.size,
-            amenities: result.amenities || [],
+            amenities: result.amenities?.join(", ") || "", // Convert array to string
             description: result.description,
             roomImages: result.roomImages || [],
             coordinates: result.coordinates || { lat: null, lng: null },
@@ -76,67 +56,53 @@ const RoomEditForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    setFormData((prev) => ({
-      ...prev,
-      roomImages: [...prev.roomImages, ...files],
-    }));
-
-    setImagePreviews([
-      ...imagePreviews,
-      ...files.map((file) => URL.createObjectURL(file)),
-    ]);
-  };
-
-  const handleAmenityChange = (e) => {
-    const { value, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      amenities: checked
-        ? [...prev.amenities, value]
-        : prev.amenities.filter((amenity) => amenity !== value),
-    }));
+    const newRoomImages = [...formData.roomImages, ...files];
+    setFormData({ ...formData, roomImages: newRoomImages });
+    setImagePreviews(newRoomImages.map((file) => URL.createObjectURL(file)));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const data = {
-      name: formData.name,
-      price: formData.price,
-      size: formData.size,
-      description: formData.description,
-      amenities: formData.amenities,
-      roomImages: formData.roomImages, // Ensure images are sent correctly
-      available: formData.available,
-      coordinates: formData.coordinates,
-    };
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("price", formData.price);
+    data.append("size", formData.size);
+    data.append("description", formData.description);
+    data.append("amenities", formData.amenities);
+    data.append("location", formData.location);
+    data.append("owner", formData.owner);
+    data.append("coordinates", JSON.stringify(formData.coordinates));
 
-    console.log("Sending update request with data:", data); // Log request data
+    formData.roomImages.forEach((file) => {
+      data.append("roomImages", file);
+    });
 
     try {
       const response = await fetch(`/api/room/rooms/${roomId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: data,
       });
-
       const result = await response.json();
-      console.log("Update Response:", result); // Log response
 
       if (response.ok) {
         setMessage("Room updated successfully!");
-        setTimeout(() => navigate("/dashboard"), 1500);
+        // Optionally, redirect to another page
+        // navigate("/somewhere");
       } else {
         setMessage("Error: " + result.message);
       }
     } catch (error) {
-      console.error("Error updating room:", error);
+      console.error("Error:", error);
       setMessage("An error occurred while updating the room.");
     } finally {
       setIsLoading(false);
@@ -155,83 +121,115 @@ const RoomEditForm = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="col-span-1">
-            <label className="block text-lg font-semibold text-gray-800">
+            <label
+              className="block text-lg font-semibold text-gray-800"
+              htmlFor="name"
+            >
               Room Name
             </label>
             <input
               type="text"
+              id="name"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="mt-2 block w-full px-4 py-3 border rounded-lg focus:ring-2"
+              className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
 
           <div className="col-span-1">
-            <label className="block text-lg font-semibold text-gray-800">
+            <label
+              className="block text-lg font-semibold text-gray-800"
+              htmlFor="price"
+            >
               Price (Rs)
             </label>
             <input
               type="number"
+              id="price"
               name="price"
               value={formData.price}
               onChange={handleChange}
               min="0"
-              className="mt-2 block w-full px-4 py-3 border rounded-lg focus:ring-2"
+              className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="col-span-1">
+            <label
+              className="block text-lg font-semibold text-gray-800"
+              htmlFor="size"
+            >
+              Size (sq ft)
+            </label>
+            <input
+              type="number"
+              id="size"
+              name="size"
+              value={formData.size}
+              onChange={handleChange}
+              min="0"
+              className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              required
+            />
+          </div>
+
+          {/* LocationInput component would go here */}
+        </div>
+
         <div className="mb-6">
-          <label className="block text-lg font-semibold text-gray-800">
-            Size (sq ft)
+          <label
+            className="block text-lg font-semibold text-gray-800"
+            htmlFor="amenities"
+          >
+            Amenities (comma separated)
           </label>
-          <input
-            type="number"
-            name="size"
-            value={formData.size}
+          <textarea
+            id="amenities"
+            name="amenities"
+            value={formData.amenities} // This is a string now
             onChange={handleChange}
-            min="0"
-            className="mt-2 block w-full px-4 py-3 border rounded-lg focus:ring-2"
+            className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            placeholder="E.g., WiFi, Parking, Air Conditioning"
             required
           />
         </div>
 
         <div className="mb-6">
-          <label className="block text-lg font-semibold text-gray-800">
-            Amenities
+          <label
+            className="block text-lg font-semibold text-gray-800"
+            htmlFor="description"
+          >
+            Description
           </label>
-          <div className="flex flex-wrap gap-4 mt-2">
-            {AMENITIES.map((amenity) => (
-              <label
-                key={amenity}
-                className="inline-flex items-center text-gray-700"
-              >
-                <input
-                  type="checkbox"
-                  value={amenity}
-                  checked={formData.amenities.includes(amenity)}
-                  onChange={handleAmenityChange}
-                  className="mr-2"
-                />
-                {amenity}
-              </label>
-            ))}
-          </div>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            required
+          />
         </div>
 
         <div className="mb-6">
-          <label className="block text-lg font-semibold text-gray-800">
+          <label
+            className="block text-lg font-semibold text-gray-800"
+            htmlFor="roomImages"
+          >
             Room Images
           </label>
           <input
             type="file"
+            id="roomImages"
             name="roomImages"
             onChange={handleFileChange}
             multiple
-            className="mt-2 block w-full text-sm text-green-600 bg-green-50 border rounded-lg file:px-4 file:py-3"
+            className="mt-2 block w-full text-sm text-green-600 bg-green-50 border border-green-300 hover:bg-green-100 rounded-lg file:px-4 file:py-3 file:rounded-lg"
           />
         </div>
 
@@ -245,7 +243,7 @@ const RoomEditForm = () => {
                 <img
                   key={index}
                   src={preview}
-                  alt={`Room ${index + 1}`}
+                  alt={`Room image preview ${index + 1}`}
                   className="w-24 h-24 object-cover rounded-lg"
                 />
               ))}
@@ -255,16 +253,14 @@ const RoomEditForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-700"
+          className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
           disabled={isLoading}
         >
           {isLoading ? "Updating..." : "Update Room"}
         </button>
 
         {message && (
-          <p className="mt-6 text-center text-lg font-semibold text-green-600">
-            {message}
-          </p>
+          <div className="mt-4 text-center text-xl text-red-600">{message}</div>
         )}
       </form>
     </div>
