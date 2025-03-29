@@ -5,6 +5,8 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { FaArrowLeft, FaArrowRight, FaTimes } from "react-icons/fa";
+import RoomTour from "./RoomTour";
+import RoomImage from "./../img/Room.jpg";
 
 const customIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -20,6 +22,8 @@ const SingleRoom = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const image = [RoomImage];
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -92,6 +96,12 @@ const SingleRoom = () => {
           )}
         </div>
       </div>
+      {/* <div className="relative mb-10">
+        <RoomTour imageUrls={roomImages} />
+      </div>
+      <div className="relative mb-10">
+        <RoomTour imageUrls={image} />
+      </div> */}
 
       <div className="bg-white p-8 rounded-2xl shadow-lg space-y-6">
         <h1 className="text-4xl font-bold text-gray-800">{name}</h1>
