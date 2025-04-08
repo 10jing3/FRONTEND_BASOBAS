@@ -1,133 +1,71 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
-const RoomMate = () => {
-  const [formData, setFormData] = useState({
-    sleepSchedule: "",
-    noiseLevel: "",
-    cleanliness: "",
-    smoking: "",
-    pets: "",
-    guests: "",
-  });
+export default function MatchRoommates() {
+  const { currentUser } = useSelector((state) => state.user);
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        const res = await fetch(`/api/match/matchmates/${currentUser._id}`);
+        const data = await res.json();
+        setMatches(data);
+      } catch (err) {
+        console.error("Error fetching matches:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("User Preferences:", formData);
-    // You can now send this data to the backend
-  };
+    if (currentUser?._id) {
+      fetchMatches();
+    }
+  }, [currentUser]);
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-4 rounded-xl shadow-lg max-w-md mx-auto space-y-4 bg-white"
-    >
-      <h2 className="text-xl font-bold mb-4 text-center">
-        Your Living Preferences
-      </h2>
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-4">Roommate Matches</h1>
 
-      <div>
-        <label className="block font-medium">Sleep Schedule</label>
-        <select
-          name="sleepSchedule"
-          value={formData.sleepSchedule}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Select</option>
-          <option value="early">Early (10pm - 7am)</option>
-          <option value="normal">Normal (11pm - 8am)</option>
-          <option value="late">Late (After Midnight)</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium">Noise Level Tolerance</label>
-        <select
-          name="noiseLevel"
-          value={formData.noiseLevel}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Select</option>
-          <option value="quiet">Prefer quiet environment</option>
-          <option value="moderate">Moderate noise is okay</option>
-          <option value="noisy">I’m okay with noise</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium">Cleanliness</label>
-        <select
-          name="cleanliness"
-          value={formData.cleanliness}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Select</option>
-          <option value="neat">Very neat and tidy</option>
-          <option value="average">Average cleanliness</option>
-          <option value="messy">I'm a bit messy</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium">Do you smoke?</label>
-        <select
-          name="smoking"
-          value={formData.smoking}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Select</option>
-          <option value="no">No</option>
-          <option value="occasionally">Occasionally</option>
-          <option value="yes">Yes</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium">Are you okay with pets?</label>
-        <select
-          name="pets"
-          value={formData.pets}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Select</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-          <option value="allergic">I'm allergic</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium">Do you allow guests over?</label>
-        <select
-          name="guests"
-          value={formData.guests}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Select</option>
-          <option value="never">Never</option>
-          <option value="sometimes">Sometimes</option>
-          <option value="often">Often</option>
-        </select>
-      </div>
-
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-      >
-        Save Preferences
-      </button>
-    </form>
+      {loading ? (
+        <p className="text-center text-gray-500">Loading matches...</p>
+      ) : matches.length === 0 ? (
+        <p className="text-center text-gray-500">No matches found.</p>
+      ) : (
+        <div className="grid gap-4">
+          {matches.map((user) => (
+            <div key={user._id} className="border p-4 rounded-lg shadow">
+              <div className="flex items-center gap-4">
+                <img
+                  src={user.image || "/default-avatar.png"}
+                  alt={user.name}
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+                <div>
+                  <h2 className="text-lg font-semibold">{user.name}</h2>
+                  <p>
+                    Match Score:{" "}
+                    <strong className="text-green-600">
+                      {console.log("roommate", user)}
+                      {user.matchScore}
+                    </strong>
+                  </p>
+                  <p>Phone: {user.phone}</p>
+                  <p>Gender: {user.gender}</p>
+                  <p>Budget: ${user.budget}</p>
+                  <p>
+                    Hobbies:{" "}
+                    {user.hobbies && user.hobbies.length > 0
+                      ? user.hobbies.join(", ")
+                      : "N/A"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
-};
-
-export default RoomMate;
+}
