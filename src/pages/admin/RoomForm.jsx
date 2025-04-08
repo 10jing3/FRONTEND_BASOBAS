@@ -222,6 +222,33 @@ const RoomForm = () => {
           <div className="col-span-1">
             <label
               className="block text-lg font-semibold text-gray-800"
+              htmlFor="category"
+            >
+              Category
+            </label>
+            <select
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              required
+            >
+              <option value="select option">Select Option</option>
+              <option value="single room">Single Room</option>
+              <option value="two room">Two Room</option>
+              <option value="2 BHK">2 BHK</option>
+              <option value="4 BHK">4 BHK</option>
+              <option value="flat">Flat</option>
+              <option value="house">House</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="col-span-1">
+            <label
+              className="block text-lg font-semibold text-gray-800"
               htmlFor="size"
             >
               Size (sq ft)
@@ -338,6 +365,193 @@ const RoomForm = () => {
             </div>
           </div>
         )}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Date Of Build */}
+          <div>
+            <label
+              htmlFor="dateOfBuild"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Date Of Build
+            </label>
+            <select
+              id="dateOfBuild"
+              name="dateOfBuild"
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select Option</option>
+              {/* Add your date options here (e.g., years) */}
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+              {/* ... more years ... */}
+            </select>
+          </div>
+
+          {/* Bed Room eg. 1,2,3 */}
+          <div>
+            <label
+              htmlFor="bedrooms"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Bed Room eg. 1,2,3
+            </label>
+            <input
+              type="number"
+              id="bedrooms"
+              name="bedrooms"
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+
+          {/* Kitchen */}
+          <div>
+            <label
+              htmlFor="kitchen"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Kitchen
+            </label>
+            <select
+              id="kitchen"
+              name="kitchen"
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select Kitchen</option>
+              {/* Add your kitchen options here */}
+              <option value="modular">Modular</option>
+              <option value="semi-modular">Semi-Modular</option>
+              <option value="standard">Standard</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+
+          {/* Bath Room eg. 1,2,3 .. */}
+          <div>
+            <label
+              htmlFor="bathrooms"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Bath Room eg. 1,2,3 ..
+            </label>
+            <input
+              type="number"
+              id="bathrooms"
+              name="bathrooms"
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+
+          {/* Furnishing */}
+          <div>
+            <label
+              htmlFor="furnishing"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Furnishing
+            </label>
+            <select
+              id="furnishing"
+              name="furnishing"
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select Option</option>
+              {/* Add your furnishing options here */}
+              <option value="furnished">Furnished</option>
+              <option value="semi-furnished">Semi-Furnished</option>
+              <option value="unfurnished">Unfurnished</option>
+            </select>
+          </div>
+
+          {/* Faced */}
+          <div>
+            <label
+              htmlFor="faced"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Faced
+            </label>
+            <select
+              id="faced"
+              name="faced"
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select Option</option>
+              {/* Add your facing options here */}
+              <option value="north">North</option>
+              <option value="south">South</option>
+              <option value="east">East</option>
+              <option value="west">West</option>
+            </select>
+          </div>
+
+          {/* Parking */}
+          <div>
+            <label
+              htmlFor="parking"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Parking
+            </label>
+            <select
+              id="parking"
+              name="parking"
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">--Select Option--</option>
+              {/* Add your parking options here */}
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+              <option value="covered">Covered</option>
+              <option value="open">Open</option>
+            </select>
+          </div>
+
+          {/* Balcony */}
+          <div>
+            <label
+              htmlFor="balcony"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Balcony
+            </label>
+            <select
+              id="balcony"
+              name="balcony"
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select Option</option>
+              {/* Add your balcony options here */}
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+
+          {/* Rental Floor */}
+          <div>
+            <label
+              htmlFor="rentalFloor"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Rental Floor
+            </label>
+            <select
+              id="rentalFloor"
+              name="rentalFloor"
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select Option</option>
+              {/* Add your floor options here */}
+              <option value="ground">Ground</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              {/* ... more floors ... */}
+            </select>
+          </div>
+        </div>
 
         <button
           type="submit"

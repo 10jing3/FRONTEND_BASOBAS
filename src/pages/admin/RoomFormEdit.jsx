@@ -1,3 +1,5 @@
+// React component: RoomEditForm.jsx (Fixed)
+
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
@@ -11,18 +13,17 @@ const RoomEditForm = () => {
     name: "",
     price: "",
     size: "",
-    amenities: "", // changed from array to string
+    amenities: "",
     description: "",
     roomImages: [],
     coordinates: { lat: null, lng: null },
-    owner: user?._id,
+    owner: user?._id || "",
   });
 
   const [message, setMessage] = useState("");
   const [imagePreviews, setImagePreviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch room details when component mounts
   useEffect(() => {
     const getRoom = async () => {
       try {
@@ -31,17 +32,16 @@ const RoomEditForm = () => {
 
         if (response.ok) {
           setFormData({
-            name: result.name,
-            price: result.price,
-            size: result.size,
-            amenities: result.amenities?.join(", ") || "", // Convert array to string
-            description: result.description,
-            roomImages: result.roomImages || [],
+            name: result.name || "",
+            price: result.price || "",
+            size: result.size || "",
+            amenities: result.amenities?.join(", ") || "",
+            description: result.description || "",
+            roomImages: [],
             coordinates: result.coordinates || { lat: null, lng: null },
-            owner: result.owner,
+            owner: result.owner || "",
           });
-
-          setImagePreviews(result.roomImages.map((image) => image.url));
+          setImagePreviews(result.roomImages?.map((img) => img.url) || []);
         } else {
           setMessage("Error: " + result.message);
         }
@@ -56,17 +56,13 @@ const RoomEditForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const newRoomImages = [...formData.roomImages, ...files];
-    setFormData({ ...formData, roomImages: newRoomImages });
-    setImagePreviews(newRoomImages.map((file) => URL.createObjectURL(file)));
+    setFormData({ ...formData, roomImages: files });
+    setImagePreviews(files.map((file) => URL.createObjectURL(file)));
   };
 
   const handleSubmit = async (e) => {
@@ -79,7 +75,6 @@ const RoomEditForm = () => {
     data.append("size", formData.size);
     data.append("description", formData.description);
     data.append("amenities", formData.amenities);
-    data.append("location", formData.location);
     data.append("owner", formData.owner);
     data.append("coordinates", JSON.stringify(formData.coordinates));
 
@@ -88,7 +83,7 @@ const RoomEditForm = () => {
     });
 
     try {
-      const response = await fetch(`/api/room/rooms/${roomId}`, {
+      const response = await fetch(`/api/room/updateroom/${roomId}`, {
         method: "PUT",
         body: data,
       });
@@ -96,8 +91,8 @@ const RoomEditForm = () => {
 
       if (response.ok) {
         setMessage("Room updated successfully!");
-        // Optionally, redirect to another page
-        // navigate("/somewhere");
+        alert("Room updated successfully!");
+        navigate("/dashboard"); // Optional redirection
       } else {
         setMessage("Error: " + result.message);
       }
@@ -120,7 +115,7 @@ const RoomEditForm = () => {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="col-span-1">
+          <div>
             <label
               className="block text-lg font-semibold text-gray-800"
               htmlFor="name"
@@ -133,12 +128,12 @@ const RoomEditForm = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
 
-          <div className="col-span-1">
+          <div>
             <label
               className="block text-lg font-semibold text-gray-800"
               htmlFor="price"
@@ -152,14 +147,14 @@ const RoomEditForm = () => {
               value={formData.price}
               onChange={handleChange}
               min="0"
-              className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="col-span-1">
+          <div>
             <label
               className="block text-lg font-semibold text-gray-800"
               htmlFor="size"
@@ -173,12 +168,10 @@ const RoomEditForm = () => {
               value={formData.size}
               onChange={handleChange}
               min="0"
-              className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
-
-          {/* LocationInput component would go here */}
         </div>
 
         <div className="mb-6">
@@ -191,9 +184,9 @@ const RoomEditForm = () => {
           <textarea
             id="amenities"
             name="amenities"
-            value={formData.amenities} // This is a string now
+            value={formData.amenities}
             onChange={handleChange}
-            className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
             placeholder="E.g., WiFi, Parking, Air Conditioning"
             required
           />
@@ -211,7 +204,7 @@ const RoomEditForm = () => {
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="mt-2 block w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
             required
           />
         </div>
@@ -229,7 +222,7 @@ const RoomEditForm = () => {
             name="roomImages"
             onChange={handleFileChange}
             multiple
-            className="mt-2 block w-full text-sm text-green-600 bg-green-50 border border-green-300 hover:bg-green-100 rounded-lg file:px-4 file:py-3 file:rounded-lg"
+            className="mt-2 w-full text-sm text-green-600 bg-green-50 border border-green-300 hover:bg-green-100 rounded-lg file:px-4 file:py-3 file:rounded-lg"
           />
         </div>
 
@@ -238,12 +231,12 @@ const RoomEditForm = () => {
             <label className="block text-lg font-semibold text-gray-800">
               Selected Images
             </label>
-            <div className="flex gap-4 mt-2">
+            <div className="flex gap-4 mt-2 flex-wrap">
               {imagePreviews.map((preview, index) => (
                 <img
                   key={index}
                   src={preview}
-                  alt={`Room image preview ${index + 1}`}
+                  alt={`Preview ${index + 1}`}
                   className="w-24 h-24 object-cover rounded-lg"
                 />
               ))}
@@ -253,14 +246,14 @@ const RoomEditForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500"
           disabled={isLoading}
         >
           {isLoading ? "Updating..." : "Update Room"}
         </button>
 
         {message && (
-          <div className="mt-4 text-center text-xl text-red-600">{message}</div>
+          <div className="mt-4 text-center text-lg text-red-600">{message}</div>
         )}
       </form>
     </div>

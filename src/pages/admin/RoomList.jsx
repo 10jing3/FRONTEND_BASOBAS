@@ -77,7 +77,9 @@ export default function RoomList() {
   if (isLoading)
     return <p className="text-center text-gray-500">Loading rooms...</p>;
   if (error)
-    return <p className="text-center text-red-500">Error loading rooms</p>;
+    return (
+      <p className="text-center text-red-500">No Rooms Found For this User.</p>
+    );
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md max-w-4xl mx-auto">
