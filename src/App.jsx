@@ -43,8 +43,8 @@ const AppContent = () => {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/news" element={<News />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route element={<AdminRoute />}>
-          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Route>
         <Route path="/vr-room" element={<VirtualRoom />} />

@@ -1,3 +1,6 @@
+// ✨ Full Profiles.jsx with Roommate Preferences card always visible
+// And editMode toggles inputs vs plain text for both cards
+
 import { useState } from "react";
 import {
   FaCamera,
@@ -7,7 +10,7 @@ import {
   FaSave,
   FaTimes,
   FaTrash,
-  FaSignOutAlt, // Add the sign-out icon
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -39,7 +42,6 @@ export default function Profiles() {
   const [imageError, setImageError] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
-  // Handle profile picture upload
   const handleProfilePicChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -48,7 +50,6 @@ export default function Profiles() {
     }
   };
 
-  // Upload file to Firebase
   const handleFileUpload = async (file) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
@@ -73,12 +74,12 @@ export default function Profiles() {
     );
   };
 
-  // Handle input changes
   const handleChange = (e) => {
-    setTempProfile({ ...tempProfile, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+    setTempProfile({ ...tempProfile, [name]: newValue });
   };
 
-  // Save profile changes
   const saveProfile = async () => {
     try {
       dispatch(updateUserStart());
@@ -102,7 +103,6 @@ export default function Profiles() {
     }
   };
 
-  // Delete account
   const deleteAccount = async () => {
     try {
       dispatch(deleteUserStart());
@@ -120,7 +120,6 @@ export default function Profiles() {
     }
   };
 
-  // Sign out
   const handleSignOut = async () => {
     try {
       await fetch("/api/auth/signout");
@@ -139,166 +138,257 @@ export default function Profiles() {
   }
 
   return (
-    <div className="text-black p-8 rounded-lg shadow-lg max-w-lg mx-auto mt-10">
-      <h3 className="text-3xl font-semibold text-center">Profile</h3>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-4xl font-bold text-center mb-8">Your Profile</h1>
 
-      {/* Profile Picture */}
-      <div className="relative mx-auto w-32 h-32 mt-6">
-        <img
-          src={tempProfile.profilePicture || currentUser.profilePicture}
-          alt="Profile"
-          className="w-full h-full rounded-full border-4 border-gray-500 object-cover shadow-lg"
-        />
-        {editMode && (
-          <label className="absolute bottom-2 right-2 bg-gray-700 text-white p-2 rounded-full cursor-pointer">
-            <FaCamera className="w-5 h-5" />
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleProfilePicChange}
-            />
-          </label>
-        )}
+      <div className="flex flex-col items-center mb-8">
+        <div className="relative w-32 h-32">
+          <img
+            src={tempProfile.profilePicture || currentUser.profilePicture}
+            alt="Profile"
+            className="w-full h-full rounded-full border-4 border-gray-400 object-cover shadow-md"
+          />
+          {editMode && (
+            <label className="absolute bottom-2 right-2 bg-gray-700 text-white p-2 rounded-full cursor-pointer">
+              <FaCamera />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleProfilePicChange}
+              />
+            </label>
+          )}
+        </div>
+        <p className="text-sm mt-2">
+          {imageError ? (
+            <span className="text-red-700">Error uploading image</span>
+          ) : imagePercent > 0 && imagePercent < 100 ? (
+            <span className="text-gray-600">Uploading: {imagePercent} %</span>
+          ) : imagePercent === 100 ? (
+            <span className="text-green-700">Image uploaded!</span>
+          ) : (
+            ""
+          )}
+        </p>
       </div>
 
-      {/* Upload Progress or Error */}
-      <p className="text-sm text-center mt-2">
-        {imageError ? (
-          <span className="text-red-700">
-            Error uploading image (file size must be less than 2 MB)
-          </span>
-        ) : imagePercent > 0 && imagePercent < 100 ? (
-          <span className="text-slate-700">{`Uploading: ${imagePercent} %`}</span>
-        ) : imagePercent === 100 ? (
-          <span className="text-green-700">Image uploaded successfully</span>
-        ) : (
-          ""
-        )}
-      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Personal Info Card */}
+        <div className="bg-white shadow-lg rounded-xl p-6 space-y-5 h-fit">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            Personal Info
+          </h2>
 
-      {/* Profile Details */}
-      <div className="mt-6 space-y-5">
-        <div>
-          <label className="block text-gray-400 font-medium">Username</label>
-          {editMode ? (
-            <input
-              type="text"
-              name="username"
-              value={tempProfile.username}
-              onChange={handleChange}
-              className="border p-2 w-full rounded-md text-gray-900 focus:ring-2 focus:ring-blue-400"
-            />
-          ) : (
-            <p className="text-lg font-semibold">{currentUser.username}</p>
-          )}
+          {["username", "email", "phone"].map((field) => (
+            <div key={field}>
+              <label className="text-gray-600 capitalize">{field}</label>
+              {editMode ? (
+                <input
+                  type={field === "email" ? "email" : "text"}
+                  name={field}
+                  value={tempProfile[field]}
+                  onChange={handleChange}
+                  className="w-full border p-2 rounded-md"
+                />
+              ) : (
+                <p className="font-medium">{currentUser[field]}</p>
+              )}
+            </div>
+          ))}
+
+          <div>
+            <label className="text-gray-600">Password</label>
+            <div className="relative">
+              {editMode ? (
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={tempProfile.password || ""}
+                  onChange={handleChange}
+                  className="w-full border p-2 rounded-md"
+                />
+              ) : (
+                <p className="font-medium">********</p>
+              )}
+              {editMode && (
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-2 right-3 text-gray-500"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label className="block text-gray-400 font-medium">Email</label>
-          {editMode ? (
-            <input
-              type="email"
-              name="email"
-              value={tempProfile.email}
-              onChange={handleChange}
-              className="border p-2 w-full rounded-md text-gray-900 focus:ring-2 focus:ring-blue-400"
-            />
-          ) : (
-            <p className="text-lg font-semibold">{currentUser.email}</p>
-          )}
-        </div>
+        {/* Roommate Preferences Card */}
+        <div className="bg-white shadow-lg rounded-xl p-6 space-y-5">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            Roommate Preferences
+          </h2>
 
-        <div>
-          <label className="block text-gray-400 font-medium">Password</label>
-          <div className="relative">
+          {[
+            { name: "gender", label: "Gender" },
+            { name: "budget", label: "Budget" },
+            { name: "cleanliness", label: "Cleanliness" },
+            { name: "wakeUpTime", label: "Wake Up Time" },
+            { name: "sleepTime", label: "Sleep Time" },
+            {
+              name: "preferredRoommateGender",
+              label: "Preferred Roommate Gender",
+            },
+          ].map(({ name, label }) => (
+            <div key={name}>
+              <label className="text-gray-600">{label}</label>
+              {editMode ? (
+                <input
+                  type={
+                    name.includes("Time")
+                      ? "time"
+                      : name === "budget" || name === "cleanliness"
+                      ? "number"
+                      : "text"
+                  }
+                  name={name}
+                  value={tempProfile[name] || ""}
+                  onChange={handleChange}
+                  className="w-full border p-2 rounded-md"
+                />
+              ) : (
+                <p className="font-medium">{currentUser[name] || "Not set"}</p>
+              )}
+            </div>
+          ))}
+
+          {/* Checkbox Fields */}
+          {[
+            { name: "isSmoker", label: "Smoker" },
+            { name: "isPetFriendly", label: "Pet Friendly" },
+          ].map(({ name, label }) => (
+            <div key={name}>
+              <label className="text-gray-600">{label}</label>
+              {editMode ? (
+                <input
+                  type="checkbox"
+                  name={name}
+                  checked={tempProfile[name] || false}
+                  onChange={(e) =>
+                    setTempProfile({
+                      ...tempProfile,
+                      [name]: e.target.checked,
+                    })
+                  }
+                  className="ml-2"
+                />
+              ) : (
+                <p className="font-medium">
+                  {currentUser[name] ? "Yes" : "No"}
+                </p>
+              )}
+            </div>
+          ))}
+
+          {/* Hobbies */}
+          <div>
+            <label className="text-gray-600">Hobbies</label>
             {editMode ? (
               <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={tempProfile.password}
-                onChange={handleChange}
-                className="border p-2 w-full rounded-md text-gray-900 focus:ring-2 focus:ring-blue-400"
+                type="text"
+                name="hobbies"
+                value={
+                  Array.isArray(tempProfile.hobbies)
+                    ? tempProfile.hobbies.join(", ")
+                    : tempProfile.hobbies || ""
+                }
+                onChange={(e) =>
+                  setTempProfile({
+                    ...tempProfile,
+                    hobbies: e.target.value.split(",").map((h) => h.trim()),
+                  })
+                }
+                className="w-full border p-2 rounded-md"
               />
             ) : (
-              <p className="text-lg font-semibold">********</p>
-            )}
-            {editMode && (
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2 text-gray-600"
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
+              <p className="font-medium">
+                {Array.isArray(currentUser.hobbies)
+                  ? currentUser.hobbies.join(", ")
+                  : currentUser.hobbies || "Not set"}
+              </p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Edit/Save Buttons */}
-      <div className="mt-6 flex justify-center space-x-4">
+      {/* Action Buttons */}
+      <div className="flex flex-wrap justify-center gap-4 mt-10">
         {editMode ? (
           <>
             <button
               onClick={saveProfile}
-              className="bg-blue-500 text-white px-5 py-2 rounded-md hover:bg-blue-600 flex items-center space-x-2 transition"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
             >
-              <FaSave /> <span>{loading ? "Saving..." : "Save"}</span>
+              <FaSave /> {loading ? "Saving..." : "Save"}
             </button>
             <button
               onClick={() => setEditMode(false)}
-              className="bg-gray-500 text-white px-5 py-2 rounded-md hover:bg-gray-600 flex items-center space-x-2 transition"
+              className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 flex items-center gap-2"
             >
-              <FaTimes /> <span>Cancel</span>
+              <FaTimes /> Cancel
             </button>
           </>
         ) : (
           <button
             onClick={() => setEditMode(true)}
-            className="bg-yellow-500 text-gray-900 px-5 py-2 rounded-md hover:bg-yellow-600 flex items-center space-x-2 transition"
+            className="bg-yellow-500 text-black px-6 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-2"
           >
-            <FaEdit /> <span>Edit Profile</span>
+            <FaEdit /> Edit Profile
           </button>
         )}
-      </div>
 
-      {/* Delete Account Button */}
-      <div className="mt-6 flex justify-center">
-        <button
-          onClick={() => setShowDeleteModal(true)}
-          className="bg-red-600 text-white px-5 py-2 rounded-md hover:bg-red-700 flex items-center space-x-2 transition"
-        >
-          <FaTrash /> <span>Delete Account</span>
-        </button>
-      </div>
-
-      {/* Sign Out Button */}
-      <div className="mt-6 flex justify-center">
         <button
           onClick={handleSignOut}
-          className="bg-gray-600 text-white px-5 py-2 rounded-md hover:bg-gray-700 flex items-center space-x-2 transition"
+          className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-900 flex items-center gap-2"
         >
-          <FaSignOutAlt /> <span>Sign Out</span>
+          <FaSignOutAlt /> Sign Out
+        </button>
+
+        <button
+          onClick={() => setShowDeleteModal(true)}
+          className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2"
+        >
+          <FaTrash /> Delete Account
         </button>
       </div>
+
+      {error && (
+        <p className="text-red-700 mt-5 text-center">
+          {error.message || "An error occurred"}
+        </p>
+      )}
+      {updateSuccess && (
+        <p className="text-green-700 mt-5 text-center">
+          Profile updated successfully!
+        </p>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
             <h3 className="text-xl font-semibold text-gray-900">
               Confirm Deletion
             </h3>
             <p className="text-gray-600 mt-2">
-              Are you sure you want to delete your account? This action cannot
-              be undone.
+              Are you sure you want to delete your account? This action is
+              irreversible.
             </p>
-
             <div className="mt-4 flex justify-end space-x-4">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="bg-gray-400 text-black px-4 py-2 rounded-md hover:bg-gray-500"
+                className="bg-gray-300 text-black px-4 py-2 rounded-md hover:bg-gray-400"
               >
                 Cancel
               </button>
@@ -311,17 +401,6 @@ export default function Profiles() {
             </div>
           </div>
         </div>
-      )}
-
-      {error && (
-        <p className="text-red-700 mt-5 text-center">
-          {error.message || "An error occurred"}
-        </p>
-      )}
-      {updateSuccess && (
-        <p className="text-green-700 mt-5 text-center">
-          Profile updated successfully!
-        </p>
       )}
     </div>
   );

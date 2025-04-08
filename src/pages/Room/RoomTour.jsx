@@ -73,6 +73,7 @@ function RoomTour({ imageUrls }) {
   }, [imageUrls]);
 
   const moveForward = () => {
+    // Move the camera forward by reducing the z-axis position
     setCameraPosition(
       (prev) => new Vector3(prev.x, prev.y, Math.max(prev.z - 1, 1))
     );
@@ -105,7 +106,7 @@ function RoomTour({ imageUrls }) {
             minDistance={1}
             maxDistance={5}
             target={[0, 0, 0]}
-            position={cameraPosition}
+            position={cameraPosition.toArray()} // Pass the camera position as an array
           />
           <Sphere args={[5, 60, 60]} scale={[-1, 1, 1]}>
             {panoramaTexture && (
