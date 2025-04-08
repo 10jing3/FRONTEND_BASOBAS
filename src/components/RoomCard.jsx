@@ -1,32 +1,66 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Carousel from "./Carousel";
+import {
+  FaMapMarkerAlt,
+  FaRupeeSign,
+  FaBed,
+  FaBath,
+  FaRulerCombined,
+} from "react-icons/fa";
+import { IoIosArrowForward } from "react-icons/io";
 
 const RoomCard = ({ room }) => {
   const navigate = useNavigate();
-  const { name, price, location, roomImages } = room;
+  const { name, price, location, roomImages, bedrooms, bathrooms, size } = room;
 
   return (
-    <div className="border rounded-lg shadow-md bg-white overflow-hidden transform transition-transform hover:scale-105 p-2">
+    <div className="border rounded-xl shadow-md bg-white overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
       {/* Room Image Carousel */}
-      <div className="w-full overflow-hidden rounded-t-lg">
+      <div className="w-full h-48 overflow-hidden">
         <Carousel images={roomImages} />
       </div>
 
       {/* Room Details */}
-      <div className="p-3 space-y-1">
-        <h3 className="text-sm font-semibold text-gray-800">{name}</h3>
-        <p className="text-xs text-gray-600">{location}</p>
-        <p className="text-sm font-semibold text-green-600">
-          Rs {price} / night
-        </p>
+      <div className="p-4 space-y-3">
+        <div>
+          <h3 className="text-lg font-bold text-gray-800 truncate">{name}</h3>
+          <div className="flex items-center text-gray-600 text-sm mt-1">
+            <FaMapMarkerAlt className="mr-1 text-gray-400" />
+            <span className="truncate">{location}</span>
+          </div>
+        </div>
 
-        <button
-          className="mt-1 w-auto p-2  bg-green-600 text-white text-xs font-medium rounded-md transition-all hover:bg-green-700"
-          onClick={() => navigate(`/room/${room._id}`)}
-        >
-          View Details
-        </button>
+        <div className="flex justify-between text-sm text-gray-700">
+          <div className="flex items-center space-x-2">
+            <span className="flex items-center">
+              <FaBed className="mr-1 text-gray-500" /> {bedrooms}3
+            </span>
+            <span className="flex items-center">
+              <FaBath className="mr-1 text-gray-500" /> {bathrooms}1
+            </span>
+            <span className="flex items-center">
+              <FaRulerCombined className="mr-1 text-gray-500" /> {size} sqft
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+          <div className="flex items-center">
+            <FaRupeeSign className="text-green-600" />
+            <span className="text-lg font-bold text-green-600 ml-1">
+              {price}
+            </span>
+            <span className="text-gray-500 text-sm ml-1"></span>
+          </div>
+
+          <button
+            className="flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg transition-all hover:bg-green-700"
+            onClick={() => navigate(`/room/${room._id}`)}
+          >
+            View Details <IoIosArrowForward className="ml-1" />
+          </button>
+        </div>
       </div>
     </div>
   );
