@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import img1 from "../assets/chitwan.jpg";
 import axios from "axios";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
@@ -18,26 +17,32 @@ import {
 } from "react-icons/fa";
 import { MdOutlineAttachMoney } from "react-icons/md";
 
-// Sample images (replace with your actual imports)
-const heroImage = img1;
-const profileImage1 = "https://randomuser.me/api/portraits/women/44.jpg";
-const profileImage2 = "https://randomuser.me/api/portraits/men/32.jpg";
-const profileImage3 = "https://randomuser.me/api/portraits/women/68.jpg";
+// Sample hero image (replace with your actual import)
+import heroImage from "../assets/chitwan.jpg";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState({ location: "", budget: "" });
   const [activeCity, setActiveCity] = useState("All");
 
+  // Fetch rooms based on active city filter
   const {
     data: rooms,
     isLoading,
     error,
+    isRefetching,
   } = useQuery({
-    queryKey: ["rooms"],
+    queryKey: ["rooms", activeCity],
     queryFn: async () => {
-      const res = await axios.get("/api/room/rooms");
-      return res.data;
+      if (activeCity === "All") {
+        const res = await axios.get("/api/room/rooms");
+        return res.data;
+      } else {
+        const res = await axios.get(`/api/room/search?location=${activeCity}`);
+        return res.data.rooms || [];
+      }
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const cities = ["All", "Kathmandu", "Pokhara", "Chitwan", "Lumbini"];
@@ -49,7 +54,7 @@ const Home = () => {
       review:
         "Found my dream apartment within a week! The process was so smooth and the team was incredibly helpful.",
       rating: 5,
-      image: profileImage1,
+      image: "https://randomuser.me/api/portraits/women/44.jpg",
       location: "Kathmandu",
     },
     {
@@ -58,7 +63,7 @@ const Home = () => {
       review:
         "As an expat, I was worried about finding a good place, but this platform made it effortless. Highly recommend!",
       rating: 5,
-      image: profileImage2,
+      image: "https://randomuser.me/api/portraits/men/32.jpg",
       location: "Pokhara",
     },
     {
@@ -67,7 +72,7 @@ const Home = () => {
       review:
         "The virtual tours saved me so much time. I could shortlist properties without physically visiting each one.",
       rating: 4,
-      image: profileImage3,
+      image: "https://randomuser.me/api/portraits/women/68.jpg",
       location: "Chitwan",
     },
   ];
@@ -94,6 +99,17 @@ const Home = () => {
       icon: "📞",
     },
   ];
+
+  const handleSearch = () => {
+    const queryParams = new URLSearchParams();
+    if (search.location) queryParams.append("location", search.location);
+    if (search.budget) queryParams.append("price", search.budget);
+    navigate(`/search?${queryParams.toString()}`);
+  };
+
+  const handleCityFilter = (city) => {
+    setActiveCity(city);
+  };
 
   return (
     <div className="font-sans bg-gray-50">
@@ -144,13 +160,13 @@ const Home = () => {
                   className="pl-10 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
-              <Link
-                to="/room"
+              <button
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center"
+                onClick={handleSearch}
               >
                 <FaSearch className="mr-2" />
                 Search Properties
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -174,10 +190,10 @@ const Home = () => {
             {cities.map((city) => (
               <button
                 key={city}
-                onClick={() => setActiveCity(city)}
+                onClick={() => handleCityFilter(city)}
                 className={`px-5 py-2 rounded-full transition ${
                   activeCity === city
-                    ? "bg-green-600 text-white"
+                    ? "bg-green-600 text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
@@ -187,33 +203,57 @@ const Home = () => {
           </div>
 
           {/* Properties Grid */}
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+          {isLoading || isRefetching ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-gray-100 rounded-xl overflow-hidden animate-pulse"
+                >
+                  <div className="h-48 bg-gray-200"></div>
+                  <div className="p-4 space-y-3">
+                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : error ? (
             <div className="text-center py-12 bg-red-50 rounded-lg">
               <p className="text-red-600">
                 Error loading properties. Please try again later.
               </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Retry
+              </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {rooms
-                ?.filter(
-                  (room) => activeCity === "All" || room.location === activeCity
-                )
-                .slice(0, 8)
-                .map((room) => (
-                  <RoomCard key={room._id} room={room} />
-                ))}
-            </div>
+            <>
+              {rooms?.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  {rooms.map((room) => (
+                    <RoomCard key={room._id} room={room} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <p className="text-gray-600">
+                    No properties found in {activeCity}. Try another location.
+                  </p>
+                </div>
+              )}
+            </>
           )}
 
           <div className="text-center mt-10">
             <Link
-              to="/room"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition"
+              to="/search"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition shadow-md hover:shadow-lg"
             >
               View All Properties <FaArrowRight className="ml-2" />
             </Link>
@@ -222,7 +262,7 @@ const Home = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
@@ -253,15 +293,17 @@ const Home = () => {
           >
             {testimonials.map((testimonial) => (
               <SwiperSlide key={testimonial.id}>
-                <div className="bg-gray-50 p-6 rounded-xl h-full">
+                <div className="bg-white p-6 rounded-xl h-full shadow-md hover:shadow-lg transition-shadow">
                   <div className="flex items-center mb-4">
                     <img
                       src={testimonial.image}
                       alt={testimonial.name}
-                      className="w-12 h-12 rounded-full object-cover mr-4"
+                      className="w-12 h-12 rounded-full object-cover mr-4 border-2 border-green-100"
                     />
                     <div>
-                      <h4 className="font-semibold">{testimonial.name}</h4>
+                      <h4 className="font-semibold text-gray-800">
+                        {testimonial.name}
+                      </h4>
                       <div className="flex text-yellow-400">
                         {[...Array(5)].map((_, i) => (
                           <FaStar
@@ -277,13 +319,42 @@ const Home = () => {
                   <FaQuoteLeft className="text-gray-300 text-xl mb-3" />
                   <p className="text-gray-700 mb-4">{testimonial.review}</p>
                   <div className="flex items-center text-sm text-gray-500">
-                    <FaMapMarkerAlt className="mr-1" />
+                    <FaMapMarkerAlt className="mr-1 text-green-600" />
                     {testimonial.location}
                   </div>
                 </div>
               </SwiperSlide>
             ))}
           </Swiper>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              Why Choose Us
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              We make finding your perfect home simple and stress-free
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="bg-gray-50 p-6 rounded-xl text-center hover:shadow-md transition-shadow"
+              >
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>

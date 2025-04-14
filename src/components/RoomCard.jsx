@@ -12,7 +12,7 @@ import { IoIosArrowForward } from "react-icons/io";
 
 const RoomCard = ({ room }) => {
   const navigate = useNavigate();
-  const { name, price, location, roomImages, bedrooms, bathrooms, size } = room;
+  const { name, price, location, roomImages, bedrooms, bathrooms } = room;
 
   return (
     <div className="border rounded-xl shadow-md bg-white overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
@@ -27,20 +27,17 @@ const RoomCard = ({ room }) => {
           <h3 className="text-lg font-bold text-gray-800 truncate">{name}</h3>
           <div className="flex items-center text-gray-600 text-sm mt-1">
             <FaMapMarkerAlt className="mr-1 text-gray-400" />
-            <span className="truncate">{location}</span>
+            {location ? location.split(",")[0] : location}
           </div>
         </div>
 
         <div className="flex justify-between text-sm text-gray-700">
           <div className="flex items-center space-x-2">
             <span className="flex items-center">
-              <FaBed className="mr-1 text-gray-500" /> {bedrooms}3
+              <FaBed className="mr-1 text-gray-500" /> {bedrooms}
             </span>
             <span className="flex items-center">
-              <FaBath className="mr-1 text-gray-500" /> {bathrooms}1
-            </span>
-            <span className="flex items-center">
-              <FaRulerCombined className="mr-1 text-gray-500" /> {size} sqft
+              <FaBath className="mr-1 text-gray-500" /> {bathrooms}
             </span>
           </div>
         </div>

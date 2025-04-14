@@ -1,8 +1,62 @@
-// React component: RoomEditForm.jsx (Fixed)
-
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
+import {
+  FaUpload,
+  FaMapMarkerAlt,
+  FaHome,
+  FaMoneyBillWave,
+  FaRuler,
+  FaBed,
+  FaBath,
+  FaParking,
+  FaUtensils,
+} from "react-icons/fa";
+import { MdBalcony, MdKitchen } from "react-icons/md";
+import { GiDirectionSigns } from "react-icons/gi";
+import axios from "axios";
+
+const LocationInput = ({ query, suggestions, onChange, onSelect }) => (
+  <div className="mb-6">
+    <div className="flex items-center mb-2">
+      <FaMapMarkerAlt className="text-green-600 mr-2" />
+      <label
+        className="block text-lg font-semibold text-gray-800"
+        htmlFor="location"
+      >
+        Location
+      </label>
+    </div>
+    <div className="relative">
+      <input
+        type="text"
+        id="location"
+        value={query}
+        onChange={onChange}
+        placeholder="Enter location (e.g., Kathmandu, Nepal)"
+        className="mt-1 block w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+        aria-label="Location"
+      />
+      <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+    </div>
+    {suggestions.length > 0 && (
+      <ul className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
+        {suggestions.map((location) => (
+          <li
+            key={location.place_id}
+            onClick={() => onSelect(location)}
+            className="cursor-pointer hover:bg-green-50 px-4 py-3 text-gray-700 border-b border-gray-100 last:border-b-0"
+          >
+            <p className="font-medium">{location.display_name.split(",")[0]}</p>
+            <p className="text-sm text-gray-500">
+              {location.display_name.split(",").slice(1).join(",")}
+            </p>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+);
 
 const RoomEditForm = () => {
   const { roomId } = useParams();
@@ -13,249 +67,697 @@ const RoomEditForm = () => {
     name: "",
     price: "",
     size: "",
-    amenities: "",
+    category: "",
+    bedrooms: "",
+    bathrooms: "",
+    kitchen: "",
+    faced: "",
+    parking: "",
+    balcony: "",
+    amenities: [],
     description: "",
     roomImages: [],
+    vrImages: [],
     coordinates: { lat: null, lng: null },
     owner: user?._id || "",
   });
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [vrImagePreviews, setVrImagePreviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState("");
+
+  const amenitiesOptions = [
+    "WiFi",
+    "Parking",
+    "Air Conditioning",
+    "TV",
+    "Heating",
+    "Washing Machine",
+    "Elevator",
+    "Gym",
+  ];
 
   useEffect(() => {
-    const getRoom = async () => {
+    const fetchRoom = async () => {
       try {
-        const response = await fetch(`/api/room/rooms/${roomId}`);
-        const result = await response.json();
+        setIsLoading(true);
+        const response = await axios.get(`/api/room/rooms/${roomId}`);
+        const room = response.data;
 
-        if (response.ok) {
-          setFormData({
-            name: result.name || "",
-            price: result.price || "",
-            size: result.size || "",
-            amenities: result.amenities?.join(", ") || "",
-            description: result.description || "",
-            roomImages: [],
-            coordinates: result.coordinates || { lat: null, lng: null },
-            owner: result.owner || "",
-          });
-          setImagePreviews(result.roomImages?.map((img) => img.url) || []);
-        } else {
-          setMessage("Error: " + result.message);
-        }
+        setFormData({
+          name: room.name || "",
+          price: room.price || "",
+          size: room.size || "",
+          category: room.category || "",
+          bedrooms: room.bedrooms || "",
+          bathrooms: room.bathrooms || "",
+          kitchen: room.kitchen || "",
+          faced: room.faced || "",
+          parking: room.parking || "",
+          balcony: room.balcony || "",
+          amenities: room.amenities || [],
+          description: room.description || "",
+          roomImages: [],
+          vrImages: [],
+          coordinates: room.coordinates || { lat: null, lng: null },
+          owner: room.owner || user?._id || "",
+        });
+
+        setQuery(room.location || "");
+        setSelectedLocation(room.location || "");
+        setImagePreviews(room.roomImages || []);
+        setVrImagePreviews(room.vrImages || []);
       } catch (error) {
         console.error("Error fetching room:", error);
-        setMessage("An error occurred while fetching the room.");
+        setMessage({ text: "Failed to load room details", type: "error" });
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (roomId) getRoom();
-  }, [roomId]);
+    if (roomId) fetchRoom();
+  }, [roomId, user]);
+
+  const fetchLocations = async (searchText) => {
+    if (searchText.length < 3) return;
+
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${searchText}&countrycodes=np&limit=5`
+      );
+      setSuggestions(response.data);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      setSuggestions([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
+    fetchLocations(e.target.value);
+  };
+
+  const handleSelectLocation = (location) => {
+    setSelectedLocation(location.display_name);
+    setQuery(location.display_name);
+    setSuggestions([]);
+    setFormData({
+      ...formData,
+      location: location.display_name,
+      coordinates: {
+        lat: location.lat,
+        lng: location.lon,
+      },
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    setFormData({ ...formData, roomImages: files });
-    setImagePreviews(files.map((file) => URL.createObjectURL(file)));
+    const newRoomImages = [...formData.roomImages, ...files];
+    setFormData({ ...formData, roomImages: newRoomImages });
+    setImagePreviews([
+      ...imagePreviews,
+      ...files.map((file) => URL.createObjectURL(file)),
+    ]);
+  };
+
+  const handleVRFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newVRImages = [...formData.vrImages, ...files];
+    setFormData({ ...formData, vrImages: newVRImages });
+    setVrImagePreviews([
+      ...vrImagePreviews,
+      ...files.map((file) => URL.createObjectURL(file)),
+    ]);
+  };
+
+  const handleAmenityChange = (e) => {
+    const { value, checked } = e.target;
+    setFormData((prevState) => {
+      const updatedAmenities = checked
+        ? [...prevState.amenities, value]
+        : prevState.amenities.filter((amenity) => amenity !== value);
+      return { ...prevState, amenities: updatedAmenities };
+    });
+  };
+
+  const removeImage = (index, isVR = false) => {
+    if (isVR) {
+      const newVRImages = [...formData.vrImages];
+      newVRImages.splice(index, 1);
+      setFormData({ ...formData, vrImages: newVRImages });
+
+      const newVRPreviews = [...vrImagePreviews];
+      newVRPreviews.splice(index, 1);
+      setVrImagePreviews(newVRPreviews);
+    } else {
+      const newRoomImages = [...formData.roomImages];
+      newRoomImages.splice(index, 1);
+      setFormData({ ...formData, roomImages: newRoomImages });
+
+      const newPreviews = [...imagePreviews];
+      newPreviews.splice(index, 1);
+      setImagePreviews(newPreviews);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
-    const data = new FormData();
-    data.append("name", formData.name);
-    data.append("price", formData.price);
-    data.append("size", formData.size);
-    data.append("description", formData.description);
-    data.append("amenities", formData.amenities);
-    data.append("owner", formData.owner);
-    data.append("coordinates", JSON.stringify(formData.coordinates));
-
-    formData.roomImages.forEach((file) => {
-      data.append("roomImages", file);
-    });
+    setMessage({ text: "", type: "" });
 
     try {
-      const response = await fetch(`/api/room/updateroom/${roomId}`, {
-        method: "PUT",
-        body: data,
+      const data = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (key === "coordinates" || key === "amenities") {
+          data.append(key, JSON.stringify(formData[key]));
+        } else if (key === "roomImages" || key === "vrImages") {
+          formData[key].forEach((file) => {
+            if (file instanceof File) {
+              data.append(key, file);
+            }
+          });
+        } else {
+          data.append(key, formData[key]);
+        }
       });
-      const result = await response.json();
 
-      if (response.ok) {
-        setMessage("Room updated successfully!");
-        alert("Room updated successfully!");
-        navigate("/dashboard"); // Optional redirection
+      const response = await axios.put(`/api/room/updateroom/${roomId}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.status === 200) {
+        setMessage({ text: "Room updated successfully!", type: "success" });
+        setTimeout(() => navigate("/dashboard"), 1500);
       } else {
-        setMessage("Error: " + result.message);
+        setMessage({
+          text: response.data.message || "Error updating room",
+          type: "error",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      setMessage("An error occurred while updating the room.");
+      setMessage({
+        text: "An error occurred while updating the room",
+        type: "error",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-xl w-full max-w-4xl"
-      >
-        <h1 className="text-3xl font-semibold text-center text-green-600 mb-8">
-          Edit Room
-        </h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label
-              className="block text-lg font-semibold text-gray-800"
-              htmlFor="name"
-            >
-              Room Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              className="block text-lg font-semibold text-gray-800"
-              htmlFor="price"
-            >
-              Price (Rs)
-            </label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              min="0"
-              className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
-              required
-            />
-          </div>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-extrabold text-gray-900">
+            Edit Property Listing
+          </h1>
+          <p className="mt-2 text-lg text-gray-600">
+            Update your property details
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label
-              className="block text-lg font-semibold text-gray-800"
-              htmlFor="size"
-            >
-              Size (sq ft)
-            </label>
-            <input
-              type="number"
-              id="size"
-              name="size"
-              value={formData.size}
-              onChange={handleChange}
-              min="0"
-              className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
-              required
-            />
-          </div>
-        </div>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white shadow-xl rounded-2xl overflow-hidden p-6 sm:p-8"
+        >
+          {/* Basic Information Section */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200 flex items-center">
+              <FaHome className="text-green-600 mr-2" />
+              Basic Information
+            </h2>
 
-        <div className="mb-6">
-          <label
-            className="block text-lg font-semibold text-gray-800"
-            htmlFor="amenities"
-          >
-            Amenities (comma separated)
-          </label>
-          <textarea
-            id="amenities"
-            name="amenities"
-            value={formData.amenities}
-            onChange={handleChange}
-            className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
-            placeholder="E.g., WiFi, Parking, Air Conditioning"
-            required
-          />
-        </div>
-
-        <div className="mb-6">
-          <label
-            className="block text-lg font-semibold text-gray-800"
-            htmlFor="description"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="mt-2 w-full px-4 py-3 border border-green-500 rounded-lg shadow-lg focus:ring-2 focus:ring-green-400"
-            required
-          />
-        </div>
-
-        <div className="mb-6">
-          <label
-            className="block text-lg font-semibold text-gray-800"
-            htmlFor="roomImages"
-          >
-            Room Images
-          </label>
-          <input
-            type="file"
-            id="roomImages"
-            name="roomImages"
-            onChange={handleFileChange}
-            multiple
-            className="mt-2 w-full text-sm text-green-600 bg-green-50 border border-green-300 hover:bg-green-100 rounded-lg file:px-4 file:py-3 file:rounded-lg"
-          />
-        </div>
-
-        {imagePreviews.length > 0 && (
-          <div className="mb-6">
-            <label className="block text-lg font-semibold text-gray-800">
-              Selected Images
-            </label>
-            <div className="flex gap-4 mt-2 flex-wrap">
-              {imagePreviews.map((preview, index) => (
-                <img
-                  key={index}
-                  src={preview}
-                  alt={`Preview ${index + 1}`}
-                  className="w-24 h-24 object-cover rounded-lg"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Room Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                  required
+                  placeholder="e.g., Cozy Apartment in Kathmandu"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                  required
+                >
+                  <option value="">Select Category</option>
+                  <option value="single room">Single Room</option>
+                  <option value="two room">Two Room</option>
+                  <option value="2 BHK">2 BHK</option>
+                  <option value="4 BHK">4 BHK</option>
+                  <option value="flat">Flat</option>
+                  <option value="house">House</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <FaMoneyBillWave className="text-green-600 mr-2" />
+                  Price (Rs)
+                </label>
+                <div className="relative mt-1 rounded-lg shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-gray-500">Rs</span>
+                  </div>
+                  <input
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    min="0"
+                    className="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                    required
+                    placeholder="e.g., 25000"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <FaRuler className="text-green-600 mr-2" />
+                  Size (sq ft)
+                </label>
+                <input
+                  type="number"
+                  name="size"
+                  value={formData.size}
+                  onChange={handleChange}
+                  min="0"
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                  required
+                  placeholder="e.g., 1200"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Location Section */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+              <FaMapMarkerAlt className="inline text-green-600 mr-2" />
+              Location Details
+            </h2>
+            <LocationInput
+              query={query}
+              suggestions={suggestions}
+              onChange={handleInputChange}
+              onSelect={handleSelectLocation}
+            />
+          </div>
+
+          {/* Property Details Section */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+              Property Details
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <FaBed className="text-green-600 mr-2" />
+                  Bedrooms
+                </label>
+                <select
+                  name="bedrooms"
+                  value={formData.bedrooms}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                >
+                  <option value="">Select</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4+">4+</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <FaBath className="text-green-600 mr-2" />
+                  Bathrooms
+                </label>
+                <select
+                  name="bathrooms"
+                  value={formData.bathrooms}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                >
+                  <option value="">Select</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <MdKitchen className="text-green-600 mr-2" />
+                  Kitchen
+                </label>
+                <select
+                  name="kitchen"
+                  value={formData.kitchen}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                >
+                  <option value="">Select</option>
+                  <option value="modular">Modular</option>
+                  <option value="semi-modular">Semi-Modular</option>
+                  <option value="standard">Standard</option>
+                  <option value="none">None</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <GiDirectionSigns className="text-green-600 mr-2" />
+                  Facing
+                </label>
+                <select
+                  name="faced"
+                  value={formData.faced}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                >
+                  <option value="">Select</option>
+                  <option value="north">North</option>
+                  <option value="south">South</option>
+                  <option value="east">East</option>
+                  <option value="west">West</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <FaParking className="text-green-600 mr-2" />
+                  Parking
+                </label>
+                <select
+                  name="parking"
+                  value={formData.parking}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                >
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                  <option value="covered">Covered</option>
+                  <option value="open">Open</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <MdBalcony className="text-green-600 mr-2" />
+                  Balcony
+                </label>
+                <select
+                  name="balcony"
+                  value={formData.balcony}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                >
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Amenities Section */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+              Amenities
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {amenitiesOptions.map((amenity) => (
+                <div key={amenity} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`amenity-${amenity}`}
+                    value={amenity}
+                    checked={formData.amenities.includes(amenity)}
+                    onChange={handleAmenityChange}
+                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                  />
+                  <label
+                    htmlFor={`amenity-${amenity}`}
+                    className="ml-2 text-sm text-gray-700"
+                  >
+                    {amenity}
+                  </label>
+                </div>
               ))}
             </div>
           </div>
-        )}
 
-        <button
-          type="submit"
-          className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500"
-          disabled={isLoading}
-        >
-          {isLoading ? "Updating..." : "Update Room"}
-        </button>
+          {/* Description Section */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+              Description
+            </h2>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={5}
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+              required
+              placeholder="Describe your property in detail..."
+            />
+          </div>
 
-        {message && (
-          <div className="mt-4 text-center text-lg text-red-600">{message}</div>
-        )}
-      </form>
+          {/* Images Section */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+              Property Images
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload Room Photos
+                </label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                  <div className="space-y-1 text-center">
+                    <div className="flex text-sm text-gray-600 justify-center">
+                      <label
+                        htmlFor="roomImages"
+                        className="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none"
+                      >
+                        <span>Upload files</span>
+                        <input
+                          id="roomImages"
+                          name="roomImages"
+                          type="file"
+                          onChange={handleFileChange}
+                          multiple
+                          className="sr-only"
+                        />
+                      </label>
+                      <p className="pl-1">or drag and drop</p>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, GIF up to 10MB
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload VR Tour Images (Optional)
+                </label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                  <div className="space-y-1 text-center">
+                    <div className="flex text-sm text-gray-600 justify-center">
+                      <label
+                        htmlFor="vrImages"
+                        className="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none"
+                      >
+                        <span>Upload files</span>
+                        <input
+                          id="vrImages"
+                          name="vrImages"
+                          type="file"
+                          onChange={handleVRFileChange}
+                          multiple
+                          className="sr-only"
+                        />
+                      </label>
+                      <p className="pl-1">or drag and drop</p>
+                    </div>
+                    <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {(imagePreviews.length > 0 || formData.roomImages?.length > 0) && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Selected Images Preview
+                </label>
+                <div className="flex flex-wrap gap-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {formData.roomImages
+                    ?.filter((img) => typeof img === "string")
+                    .map((img, index) => (
+                      <div key={`existing-${index}`} className="relative">
+                        <img
+                          src={img}
+                          alt={`Existing ${index + 1}`}
+                          className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                        />
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {(vrImagePreviews.length > 0 || formData.vrImages?.length > 0) && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Selected VR Images Preview
+                </label>
+                <div className="flex flex-wrap gap-4">
+                  {vrImagePreviews.map((preview, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={preview}
+                        alt={`VR Preview ${index + 1}`}
+                        className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index, true)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {formData.vrImages
+                    ?.filter((img) => typeof img === "string")
+                    .map((img, index) => (
+                      <div key={`existing-vr-${index}`} className="relative">
+                        <img
+                          src={img}
+                          alt={`Existing VR ${index + 1}`}
+                          className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                        />
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className="mt-8">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`w-full flex justify-center py-4 px-6 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors ${
+                isLoading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-6 w-6 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Updating...
+                </>
+              ) : (
+                "Update Property Listing"
+              )}
+            </button>
+          </div>
+
+          {message.text && (
+            <div
+              className={`mt-4 p-4 rounded-lg ${
+                message.type === "success"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
+        </form>
+      </div>
     </div>
   );
 };
