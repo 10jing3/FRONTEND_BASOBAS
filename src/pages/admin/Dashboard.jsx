@@ -6,6 +6,7 @@ import Profiles from "./Profiles";
 import RoomForm from "./RoomForm";
 import { useSelector } from "react-redux";
 import RoomMate from "./RoomMate";
+import Booked from "./Booked";
 
 export default function Dashboard() {
   const user = useSelector((state) => state.user.currentUser);
@@ -24,23 +25,15 @@ export default function Dashboard() {
   const renderSection = () => {
     switch (activeSection) {
       case "dashboard":
-        return (
-          <>
-            <RoomForm />
-          </>
-        );
-      case "rooms":
         return <RoomList rooms={rooms} />;
-      case "users":
-        return <Users />;
       case "profile":
         return <Profiles />;
       case "RoomMate":
         return <RoomMate />;
+      case "Booked":
+        return <Booked />;
       default:
-        return (
-          <h2 className="text-xl font-bold">Welcome to the Admin Panel</h2>
-        );
+        return <h2 className="text-xl font-bold"></h2>;
     }
   };
 
