@@ -1,4 +1,5 @@
-import { FaHome, FaUsers, FaBuilding, FaCog } from "react-icons/fa";
+import { FaHome, FaUsers, FaBuilding, FaCog, FaBroom } from "react-icons/fa";
+import { MdFamilyRestroom } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
 export default function SideNav({ setActiveSection }) {
@@ -24,18 +25,6 @@ export default function SideNav({ setActiveSection }) {
 
       <nav>
         <ul className="space-y-4">
-          {/* Hide "Add Room" if on Admin Dashboard */}
-          {!isAdminDashboard && (
-            <li>
-              <button
-                onClick={() => setActiveSection("dashboard")}
-                className="flex items-center space-x-2 hover:text-gray-400 w-full text-left"
-              >
-                <FaHome className="h-6 w-6" />
-                <span>Add Room</span>
-              </button>
-            </li>
-          )}
           <li>
             <button
               onClick={() => setActiveSection("rooms")}
@@ -73,6 +62,15 @@ export default function SideNav({ setActiveSection }) {
             >
               <FaCog className="h-6 w-6" />
               <span>RoomMate</span>
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => setActiveSection("Booked")}
+              className="flex items-center space-x-2 hover:text-gray-400 w-full text-left"
+            >
+              <MdFamilyRestroom className="h-6 w-6" />
+              <span>Booked</span>
             </button>
           </li>
         </ul>
