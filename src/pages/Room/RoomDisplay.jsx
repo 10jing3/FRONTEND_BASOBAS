@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -51,6 +52,7 @@ const SingleRoom = () => {
   const [mainImage, setMainImage] = useState(null);
   const [activeTab, setActiveTab] = useState("description");
   const [showToast, setShowToast] = useState(false);
+  const [showLoginToast, setShowLoginToast] = useState(false);
 
   useEffect(() => {
     const fetchRoomAndOwner = async () => {
@@ -83,8 +85,42 @@ const SingleRoom = () => {
   }, [room]);
 
   const handleBookNow = () => {
-    setShowToast(true);
+    try {
+      // 1. Get user data from localStorage
+      const userData = localStorage.getItem("user");
+
+      // 2. Parse the data (handle potential double-encoding)
+      let parsedUser;
+      try {
+        parsedUser = JSON.parse(userData);
+        // Handle case where the value was double-stringified
+        if (typeof parsedUser === "string") {
+          parsedUser = JSON.parse(parsedUser);
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        if (window.confirm("Login session invalid. Please login again.")) {
+          navigate("/login", { state: { from: `/room/${roomId}` } });
+        }
+        return;
+      }
+
+      // 3. Check if user is authenticated
+      if (!parsedUser?.currentUser) {
+        if (window.confirm("You need to login to book this room. Login now?")) {
+          navigate("/login", { state: { from: `/room/${roomId}` } });
+        }
+        return;
+      }
+
+      // 4. Only show payment modal if user is logged in
+      setShowToast(true);
+    } catch (error) {
+      console.error("Booking error:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
+
   const handleCancel = () => {
     setShowToast(false);
   };
