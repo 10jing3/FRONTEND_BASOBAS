@@ -57,10 +57,9 @@ const Footer = () => {
           <ul className="space-y-2 text-sm">
             {[
               { name: "About us", path: "/about" },
-              { name: "Announcements", path: "/about" },
+
               { name: "News", path: "/news" },
-              { name: "Contact", path: "/about" },
-              { name: "Features", path: "/about" },
+              { name: "Contact", path: "/contact" },
             ].map((item, index) => (
               <li key={index} className="hover:text-green-500 cursor-pointer">
                 <Link to={item.path}>{item.name}</Link>
