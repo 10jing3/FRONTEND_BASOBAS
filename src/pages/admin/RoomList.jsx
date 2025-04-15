@@ -3,7 +3,6 @@ import {
   FaTrash,
   FaEdit,
   FaEye,
-  FaStar,
   FaBed,
   FaBath,
   FaRulerCombined,
@@ -28,22 +27,40 @@ export default function RoomList() {
 
   // Fetch rooms based on user role
   const {
-    data: rooms = [],
+    data: roomsData,
     isLoading,
     error,
   } = useQuery({
     queryKey: ["rooms", user?._id, user?.role],
     queryFn: async () => {
-      if (!user) return [];
-      const endpoint =
-        user.role === "admin"
-          ? "/api/room/rooms"
-          : `/api/room/get-room-by-owner/${user._id}`;
-      const { data } = await axios.get(endpoint);
-      return data;
+      if (!user) return { rooms: [] };
+
+      try {
+        const endpoint =
+          user.role === "admin"
+            ? "/api/room/rooms"
+            : `/api/room/get-room-by-owner/${user._id}`;
+        const { data } = await axios.get(endpoint);
+
+        // Normalize the response to always return { rooms: [] } format
+        if (Array.isArray(data)) {
+          return { rooms: data };
+        } else if (Array.isArray(data?.rooms)) {
+          return { rooms: data.rooms };
+        } else if (Array.isArray(data?.data)) {
+          return { rooms: data.data };
+        }
+        return { rooms: [] };
+      } catch (err) {
+        console.error("Error fetching rooms:", err);
+        return { rooms: [] };
+      }
     },
     enabled: !!user,
   });
+
+  // Extract rooms from normalized data
+  const rooms = roomsData?.rooms || [];
 
   // Delete room mutation
   const deleteRoomMutation = useMutation({
@@ -53,16 +70,16 @@ export default function RoomList() {
       });
     },
     onSuccess: (_, id) => {
-      queryClient.setQueryData(
-        ["rooms"],
-        (oldData) => oldData?.filter((room) => room._id !== id) || []
-      );
+      queryClient.setQueryData(["rooms"], (oldData) => ({
+        rooms: (oldData?.rooms || []).filter((room) => room._id !== id),
+      }));
       queryClient.invalidateQueries(["rooms"]);
       setDeleteModal({ isOpen: false, roomId: null, roomName: "" });
     },
     onError: (error) => {
       alert(
-        "Failed to delete room: " + (error.response?.data || error.message)
+        "Failed to delete room: " +
+          (error.response?.data?.message || error.message)
       );
     },
   });
@@ -84,19 +101,23 @@ export default function RoomList() {
     navigate(`/edit-room/${roomId}`);
   };
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
       </div>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded max-w-4xl mx-auto my-8">
-        <p className="text-center font-medium">No Rooms Found For this User</p>
+        <p className="text-center font-medium">
+          Error loading rooms: {error.message}
+        </p>
       </div>
     );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -106,7 +127,7 @@ export default function RoomList() {
         </h1>
         {user?.role !== "admin" && (
           <Link
-            to="/add-room"
+            to="/create-room"
             className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center"
           >
             + Add New Room
@@ -170,7 +191,7 @@ export default function RoomList() {
                   </div>
                   <div className="flex items-center">
                     <FaRulerCombined className="mr-1 text-green-600" />
-                    <span>{room.area || "N/A"} sq.ft</span>
+                    <span>{room.size || "N/A"} sq.ft</span>
                   </div>
                 </div>
 
