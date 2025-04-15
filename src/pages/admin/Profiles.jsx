@@ -1,6 +1,3 @@
-// ✨ Full Profiles.jsx with Roommate Preferences card always visible
-// And editMode toggles inputs vs plain text for both cards
-
 import { useState } from "react";
 import {
   FaCamera,
@@ -11,7 +8,21 @@ import {
   FaTimes,
   FaTrash,
   FaSignOutAlt,
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaClock,
+  FaPaw,
+  FaSmoking,
+  FaMoneyBillWave,
+  FaBroom,
+  FaVenusMars,
+  FaHiking,
+  FaLock,
+  FaExclamationTriangle,
 } from "react-icons/fa";
+import { RiLoader4Line } from "react-icons/ri";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { useSelector, useDispatch } from "react-redux";
 import {
   updateUserStart,
@@ -98,6 +109,7 @@ export default function Profiles() {
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
       setEditMode(false);
+      setTimeout(() => setUpdateSuccess(false), 3000);
     } catch (error) {
       dispatch(updateUserFailure(error));
     }
@@ -139,18 +151,32 @@ export default function Profiles() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-8">Your Profile</h1>
+      <div className="text-center mb-10">
+        <h1 className="text-4xl font-bold text-gray-800">Your Profile</h1>
+        <p className="text-gray-600 mt-2">
+          {editMode
+            ? "Edit your profile details"
+            : "View and manage your profile"}
+        </p>
+      </div>
 
-      <div className="flex flex-col items-center mb-8">
-        <div className="relative w-32 h-32">
-          <img
-            src={tempProfile.profilePicture || currentUser.profilePicture}
-            alt="Profile"
-            className="w-full h-full rounded-full border-4 border-gray-400 object-cover shadow-md"
-          />
+      {/* Profile Picture Section */}
+      <div className="flex flex-col items-center mb-10">
+        <div className="relative group">
+          <div className="w-40 h-40 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 border-4 border-white shadow-lg overflow-hidden">
+            <img
+              src={
+                tempProfile.profilePicture ||
+                currentUser.profilePicture ||
+                "/default-profile.png"
+              }
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          </div>
           {editMode && (
-            <label className="absolute bottom-2 right-2 bg-gray-700 text-white p-2 rounded-full cursor-pointer">
-              <FaCamera />
+            <label className="absolute -bottom-2 -right-2 bg-blue-600 text-white p-3 rounded-full shadow-md cursor-pointer hover:bg-blue-700 transition-colors">
+              <FaCamera className="text-lg" />
               <input
                 type="file"
                 accept="image/*"
@@ -160,164 +186,262 @@ export default function Profiles() {
             </label>
           )}
         </div>
-        <p className="text-sm mt-2">
-          {imageError ? (
-            <span className="text-red-700">Error uploading image</span>
-          ) : imagePercent > 0 && imagePercent < 100 ? (
-            <span className="text-gray-600">Uploading: {imagePercent} %</span>
-          ) : imagePercent === 100 ? (
-            <span className="text-green-700">Image uploaded!</span>
-          ) : (
-            ""
-          )}
-        </p>
+        {imageError ? (
+          <p className="mt-3 text-sm text-red-600 flex items-center">
+            <FaExclamationTriangle className="mr-1" />
+            Error uploading image (max 2MB)
+          </p>
+        ) : imagePercent > 0 && imagePercent < 100 ? (
+          <div className="mt-3 w-48">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm text-blue-600">Uploading...</span>
+              <span className="text-xs text-blue-600">{imagePercent}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-blue-600 h-2 rounded-full"
+                style={{ width: `${imagePercent}%` }}
+              ></div>
+            </div>
+          </div>
+        ) : imagePercent === 100 ? (
+          <p className="mt-3 text-sm text-green-600 flex items-center">
+            <IoMdCheckmarkCircleOutline className="mr-1" />
+            Image uploaded successfully!
+          </p>
+        ) : null}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Personal Info Card */}
-        <div className="bg-white shadow-lg rounded-xl p-6 space-y-5 h-fit">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">
-            Personal Info
-          </h2>
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Personal Information
+            </h2>
+            {!editMode && (
+              <button
+                onClick={() => setEditMode(true)}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                <FaEdit className="text-lg" />
+              </button>
+            )}
+          </div>
 
-          {["username", "email", "phone"].map((field) => (
-            <div key={field}>
-              <label className="text-gray-600 capitalize">{field}</label>
-              {editMode ? (
-                <input
-                  type={field === "email" ? "email" : "text"}
-                  name={field}
-                  value={tempProfile[field]}
-                  onChange={handleChange}
-                  className="w-full border p-2 rounded-md"
-                />
-              ) : (
-                <p className="font-medium">{currentUser[field]}</p>
-              )}
-            </div>
-          ))}
+          <div className="space-y-5">
+            {[
+              { field: "username", icon: <FaUser className="text-gray-500" /> },
+              {
+                field: "email",
+                icon: <FaEnvelope className="text-gray-500" />,
+              },
+              { field: "phone", icon: <FaPhone className="text-gray-500" /> },
+            ].map(({ field, icon }) => (
+              <div key={field} className="space-y-1">
+                <label className="text-sm font-medium text-gray-700 capitalize">
+                  {field}
+                </label>
+                <div className="flex items-center">
+                  <span className="mr-3">{icon}</span>
+                  {editMode ? (
+                    <input
+                      type={field === "email" ? "email" : "text"}
+                      name={field}
+                      value={tempProfile[field] || ""}
+                      onChange={handleChange}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  ) : (
+                    <p className="text-gray-800">
+                      {currentUser[field] || "Not provided"}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
 
-          <div>
-            <label className="text-gray-600">Password</label>
-            <div className="relative">
-              {editMode ? (
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={tempProfile.password || ""}
-                  onChange={handleChange}
-                  className="w-full border p-2 rounded-md"
-                />
-              ) : (
-                <p className="font-medium">********</p>
-              )}
-              {editMode && (
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute top-2 right-3 text-gray-500"
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              )}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="flex items-center relative">
+                <span className="mr-3">
+                  <FaLock className="text-gray-500" />
+                </span>
+                {editMode ? (
+                  <>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={tempProfile.password || ""}
+                      onChange={handleChange}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Enter new password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 text-gray-500 hover:text-gray-700"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-gray-800">••••••••</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Roommate Preferences Card */}
-        <div className="bg-white shadow-lg rounded-xl p-6 space-y-5">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">
-            Roommate Preferences
-          </h2>
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Roommate Preferences
+            </h2>
+            {!editMode && (
+              <button
+                onClick={() => setEditMode(true)}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                <FaEdit className="text-lg" />
+              </button>
+            )}
+          </div>
 
-          {[
-            { name: "gender", label: "Gender" },
-            { name: "budget", label: "Budget" },
-            { name: "cleanliness", label: "Cleanliness" },
-            { name: "wakeUpTime", label: "Wake Up Time" },
-            { name: "sleepTime", label: "Sleep Time" },
-            {
-              name: "preferredRoommateGender",
-              label: "Preferred Roommate Gender",
-            },
-          ].map(({ name, label }) => (
-            <div key={name}>
-              <label className="text-gray-600">{label}</label>
+          <div className="space-y-5">
+            {[
+              {
+                name: "gender",
+                icon: <FaVenusMars className="text-gray-500" />,
+              },
+              {
+                name: "budget",
+                icon: <FaMoneyBillWave className="text-gray-500" />,
+              },
+              {
+                name: "cleanliness",
+                icon: <FaBroom className="text-gray-500" />,
+              },
+              {
+                name: "wakeUpTime",
+                icon: <FaClock className="text-gray-500" />,
+              },
+              {
+                name: "sleepTime",
+                icon: <FaClock className="text-gray-500" />,
+              },
+              {
+                name: "preferredRoommateGender",
+                icon: <FaVenusMars className="text-gray-500" />,
+              },
+            ].map(({ name, icon }) => (
+              <div key={name} className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">
+                  {name
+                    .replace(/([A-Z])/g, " $1")
+                    .replace(/^./, (str) => str.toUpperCase())}
+                </label>
+                <div className="flex items-center">
+                  <span className="mr-3">{icon}</span>
+                  {editMode ? (
+                    <input
+                      type={
+                        name.includes("Time")
+                          ? "time"
+                          : name === "budget" || name === "cleanliness"
+                          ? "number"
+                          : "text"
+                      }
+                      name={name}
+                      value={tempProfile[name] || ""}
+                      onChange={handleChange}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  ) : (
+                    <p className="text-gray-800">
+                      {currentUser[name] || "Not specified"}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Checkbox Fields */}
+            {[
+              {
+                name: "isSmoker",
+                icon: <FaSmoking className="text-gray-500" />,
+              },
+              {
+                name: "isPetFriendly",
+                icon: <FaPaw className="text-gray-500" />,
+              },
+            ].map(({ name, icon }) => (
+              <div key={name} className="space-y-1">
+                <div className="flex items-center">
+                  <span className="mr-3">{icon}</span>
+                  <label className="text-sm font-medium text-gray-700 mr-3">
+                    {name
+                      .replace(/([A-Z])/g, " $1")
+                      .replace(/^./, (str) => str.toUpperCase())}
+                  </label>
+                  {editMode ? (
+                    <input
+                      type="checkbox"
+                      name={name}
+                      checked={tempProfile[name] || false}
+                      onChange={(e) =>
+                        setTempProfile({
+                          ...tempProfile,
+                          [name]: e.target.checked,
+                        })
+                      }
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                  ) : (
+                    <p className="text-gray-800">
+                      {currentUser[name] ? "Yes" : "No"}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Hobbies */}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700 flex items-center">
+                <FaHiking className="text-gray-500 mr-3" />
+                Hobbies
+              </label>
               {editMode ? (
                 <input
-                  type={
-                    name.includes("Time")
-                      ? "time"
-                      : name === "budget" || name === "cleanliness"
-                      ? "number"
-                      : "text"
+                  type="text"
+                  name="hobbies"
+                  value={
+                    Array.isArray(tempProfile.hobbies)
+                      ? tempProfile.hobbies.join(", ")
+                      : tempProfile.hobbies || ""
                   }
-                  name={name}
-                  value={tempProfile[name] || ""}
-                  onChange={handleChange}
-                  className="w-full border p-2 rounded-md"
-                />
-              ) : (
-                <p className="font-medium">{currentUser[name] || "Not set"}</p>
-              )}
-            </div>
-          ))}
-
-          {/* Checkbox Fields */}
-          {[
-            { name: "isSmoker", label: "Smoker" },
-            { name: "isPetFriendly", label: "Pet Friendly" },
-          ].map(({ name, label }) => (
-            <div key={name}>
-              <label className="text-gray-600">{label}</label>
-              {editMode ? (
-                <input
-                  type="checkbox"
-                  name={name}
-                  checked={tempProfile[name] || false}
                   onChange={(e) =>
                     setTempProfile({
                       ...tempProfile,
-                      [name]: e.target.checked,
+                      hobbies: e.target.value.split(",").map((h) => h.trim()),
                     })
                   }
-                  className="ml-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Separate hobbies with commas"
                 />
               ) : (
-                <p className="font-medium">
-                  {currentUser[name] ? "Yes" : "No"}
+                <p className="text-gray-800 ml-8">
+                  {Array.isArray(currentUser.hobbies)
+                    ? currentUser.hobbies.join(", ")
+                    : currentUser.hobbies || "Not specified"}
                 </p>
               )}
             </div>
-          ))}
-
-          {/* Hobbies */}
-          <div>
-            <label className="text-gray-600">Hobbies</label>
-            {editMode ? (
-              <input
-                type="text"
-                name="hobbies"
-                value={
-                  Array.isArray(tempProfile.hobbies)
-                    ? tempProfile.hobbies.join(", ")
-                    : tempProfile.hobbies || ""
-                }
-                onChange={(e) =>
-                  setTempProfile({
-                    ...tempProfile,
-                    hobbies: e.target.value.split(",").map((h) => h.trim()),
-                  })
-                }
-                className="w-full border p-2 rounded-md"
-              />
-            ) : (
-              <p className="font-medium">
-                {Array.isArray(currentUser.hobbies)
-                  ? currentUser.hobbies.join(", ")
-                  : currentUser.hobbies || "Not set"}
-              </p>
-            )}
           </div>
         </div>
       </div>
@@ -328,75 +452,104 @@ export default function Profiles() {
           <>
             <button
               onClick={saveProfile}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              disabled={loading}
+              className={`flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg shadow-md hover:from-blue-700 hover:to-blue-600 transition-all ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              <FaSave /> {loading ? "Saving..." : "Save"}
+              {loading ? (
+                <>
+                  <RiLoader4Line className="animate-spin mr-2" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <FaSave className="mr-2" />
+                  Save Changes
+                </>
+              )}
             </button>
             <button
               onClick={() => setEditMode(false)}
-              className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 flex items-center gap-2"
+              className="flex items-center px-6 py-3 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition-all"
             >
-              <FaTimes /> Cancel
+              <FaTimes className="mr-2" />
+              Cancel
             </button>
           </>
         ) : (
           <button
             onClick={() => setEditMode(true)}
-            className="bg-yellow-500 text-black px-6 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-2"
+            className="flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 text-gray-800 rounded-lg shadow-md hover:from-yellow-600 hover:to-yellow-500 transition-all"
           >
-            <FaEdit /> Edit Profile
+            <FaEdit className="mr-2" />
+            Edit Profile
           </button>
         )}
 
         <button
           onClick={handleSignOut}
-          className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-900 flex items-center gap-2"
+          className="flex items-center px-6 py-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-800 transition-all"
         >
-          <FaSignOutAlt /> Sign Out
+          <FaSignOutAlt className="mr-2" />
+          Sign Out
         </button>
 
         <button
           onClick={() => setShowDeleteModal(true)}
-          className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2"
+          className="flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg shadow-md hover:from-red-700 hover:to-red-600 transition-all"
         >
-          <FaTrash /> Delete Account
+          <FaTrash className="mr-2" />
+          Delete Account
         </button>
       </div>
 
+      {/* Status Messages */}
       {error && (
-        <p className="text-red-700 mt-5 text-center">
-          {error.message || "An error occurred"}
-        </p>
+        <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+          <p className="text-red-700 font-medium">
+            Error: {error.message || "Failed to update profile"}
+          </p>
+        </div>
       )}
       {updateSuccess && (
-        <p className="text-green-700 mt-5 text-center">
-          Profile updated successfully!
-        </p>
+        <div className="mt-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+          <p className="text-green-700 font-medium">
+            Profile updated successfully!
+          </p>
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-xl font-semibold text-gray-900">
-              Confirm Deletion
-            </h3>
-            <p className="text-gray-600 mt-2">
-              Are you sure you want to delete your account? This action is
-              irreversible.
-            </p>
-            <div className="mt-4 flex justify-end space-x-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-start">
+              <div className="bg-red-100 p-3 rounded-full mr-4">
+                <FaExclamationTriangle className="text-red-600 text-xl" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  Delete Account?
+                </h3>
+                <p className="text-gray-600">
+                  This will permanently delete your account and all associated
+                  data. This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end space-x-4">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="bg-gray-300 text-black px-4 py-2 rounded-md hover:bg-gray-400"
+                className="px-5 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition"
               >
                 Cancel
               </button>
               <button
                 onClick={deleteAccount}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                className="px-5 py-2.5 text-white bg-red-600 hover:bg-red-700 rounded-lg font-medium transition"
               >
-                Delete
+                Delete Account
               </button>
             </div>
           </div>
