@@ -8,8 +8,9 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 export default function AdminSignIn() {
-  const [formData, setFormData] = useState({});
-  const { loading, error, userData } = useSelector((state) => state.user); // Get user role correctly
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formErrors, setFormErrors] = useState({});
+  const { loading, error } = useSelector((state) => state.user);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -18,18 +19,30 @@ export default function AdminSignIn() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
+  const validateForm = () => {
+    let errors = {};
+    if (!formData.email) {
+      errors.email = "Email is required.";
+    }
+    if (!formData.password) {
+      errors.password = "Password is required.";
+    }
+    return errors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
-      alert("Please fill in all fields.");
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
     try {
       dispatch(signInStart());
 
-      const res = await fetch(`/api/auth/signin`, {
+      const response = await fetch(`/api/auth/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,20 +50,19 @@ export default function AdminSignIn() {
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok || data.success === false) {
+      if (!response.ok || data.success === false) {
         throw new Error(data.message || "Sign-in failed.");
       }
 
       dispatch(signInSuccess(data));
 
-      // Check if the user is an admin
       if (data.role === "admin") {
-        navigate("/admin/dashboard"); // Redirect to the admin dashboard
+        navigate("/admin/dashboard");
       } else {
         dispatch(signInFailure({ message: "You do not have admin access." }));
-        navigate("/"); // Redirect to home if not an admin
+        navigate("/");
       }
     } catch (error) {
       dispatch(
@@ -71,14 +83,22 @@ export default function AdminSignIn() {
           id="email"
           className="bg-slate-100 p-3 rounded-lg"
           onChange={handleChange}
+          value={formData.email}
         />
+        {formErrors.email && <p className="text-red-500">{formErrors.email}</p>}
+
         <input
           type="password"
           placeholder="Password"
           id="password"
           className="bg-slate-100 p-3 rounded-lg"
           onChange={handleChange}
+          value={formData.password}
         />
+        {formErrors.password && (
+          <p className="text-red-500">{formErrors.password}</p>
+        )}
+
         <button
           disabled={loading}
           className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
