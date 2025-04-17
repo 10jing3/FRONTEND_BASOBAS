@@ -26,6 +26,8 @@ export default function Dashboard() {
     switch (activeSection) {
       case "dashboard":
         return <RoomList rooms={rooms} />;
+      case "rooms":
+        return <RoomList rooms={rooms} />;
       case "profile":
         return <Profiles />;
       case "RoomMate":
