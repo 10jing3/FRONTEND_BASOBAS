@@ -4,6 +4,7 @@ import RoomList from "./RoomList";
 import Users from "../../components/Users";
 import Profiles from "./Profiles";
 import { useSelector } from "react-redux";
+import { list } from "firebase/storage";
 
 function AdminDashboard() {
   const user = useSelector((state) => state.user.currentUser);
@@ -20,14 +21,14 @@ function AdminDashboard() {
     localStorage.setItem("rooms", JSON.stringify(rooms));
   }, [rooms]);
 
+  const selection_list = ["rooms", "user", "profile"];
+
   const renderSection = () => {
     switch (activeSection) {
       case "rooms":
         return <RoomList rooms={rooms} />;
       case "users":
         return <Users />;
-      case "profile":
-        return <Profiles />;
       default:
         return (
           <h2 className="text-xl font-bold">Welcome to the Admin Panel</h2>
