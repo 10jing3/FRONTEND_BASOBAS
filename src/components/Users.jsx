@@ -29,11 +29,13 @@ export default function Users() {
     staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 
-  const filteredUsers = users.filter((user) =>
-    `${user.username} ${user.name} ${user.email} ${user.role}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users
+    .filter((user) => user.role !== "admin") // Exclude admins
+    .filter((user) =>
+      `${user.username} ${user.name} ${user.email} ${user.role}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
 
   const deleteUser = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
