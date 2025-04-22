@@ -29,16 +29,18 @@ export default function SideNav({ setActiveSection }) {
   return (
     <div className="fixed inset-y-0 left-0 w-64 bg-gray-800 text-white p-6 flex flex-col">
       {/* Logo/Header Section */}
-      <div
-        className={`flex items-center space-x-3 mb-10 p-3 rounded-lg cursor-pointer transition-colors ${
-          isUserDashboard ? "hover:bg-gray-700" : ""
-        }`}
-        onClick={() => isUserDashboard && navigate("/")}
-      >
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
-          BasoBas
-        </h1>
-      </div>
+      {!isAdminDashboard && (
+        <div
+          className={`flex items-center space-x-3 mb-10 p-3 rounded-lg cursor-pointer transition-colors ${
+            isUserDashboard ? "hover:bg-gray-700" : ""
+          }`}
+          onClick={() => isUserDashboard && navigate("/")}
+        >
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
+            BasoBas
+          </h1>
+        </div>
+      )}
 
       {/* Navigation Items */}
       <nav className="flex-1">
