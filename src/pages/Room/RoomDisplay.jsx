@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -34,6 +33,8 @@ import { IoIosArrowBack } from "react-icons/io";
 import EsewaPayment from "../../components/EsewaPayment";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
 
 const customIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -43,6 +44,7 @@ const customIcon = new L.Icon({
 });
 
 const SingleRoom = () => {
+  const { currentUser } = useSelector((state) => state.user);
   const { roomId } = useParams();
   const navigate = useNavigate();
   const [room, setRoom] = useState(null);
@@ -52,7 +54,6 @@ const SingleRoom = () => {
   const [mainImage, setMainImage] = useState(null);
   const [activeTab, setActiveTab] = useState("description");
   const [showToast, setShowToast] = useState(false);
-  const [showLoginToast, setShowLoginToast] = useState(false);
 
   useEffect(() => {
     const fetchRoomAndOwner = async () => {
@@ -85,47 +86,19 @@ const SingleRoom = () => {
   }, [room]);
 
   const handleBookNow = () => {
-    try {
-      // 1. Get user data from localStorage
-      const userData = localStorage.getItem("user");
-
-      // 2. Parse the data (handle potential double-encoding)
-      let parsedUser;
-      try {
-        parsedUser = JSON.parse(userData);
-        // Handle case where the value was double-stringified
-        if (typeof parsedUser === "string") {
-          parsedUser = JSON.parse(parsedUser);
-        }
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-        if (window.confirm("Login session invalid. Please login again.")) {
-          navigate("/login", { state: { from: `/room/${roomId}` } });
-        }
-        return;
-      }
-
-      // 3. Check if user is authenticated
-      if (!parsedUser?.currentUser) {
-        if (window.confirm("You need to login to book this room. Login now?")) {
-          navigate("/login", { state: { from: `/room/${roomId}` } });
-        }
-        return;
-      }
-
-      // 4. Only show payment modal if user is logged in
-      setShowToast(true);
-    } catch (error) {
-      console.error("Booking error:", error);
-      alert("An error occurred. Please try again.");
-    }
+    setShowToast(true);
   };
-
   const handleCancel = () => {
     setShowToast(false);
   };
   const handleRoomTour = () => navigate(`/vr-room/${roomId}`);
   const handleThumbnailClick = (image) => setMainImage(image);
+  const handleLogin = () => {
+    toast.error("Log in first to Book Rooms");
+    setTimeout(() => {
+      navigate("/sign-up");
+    }, 2000);
+  };
 
   const renderAmenityIcon = (amenity) => {
     const icons = {
@@ -459,8 +432,19 @@ const SingleRoom = () => {
             </div>
 
             {/* Action Buttons */}
+
             <div className="space-y-4">
-              {available ? (
+              {!currentUser ? (
+                <div>
+                  <button
+                    onClick={handleLogin}
+                    className="w-full py-3 px-6 bg-green-600 text-white text-lg font-medium rounded-xl transition-all hover:bg-green-700 shadow-md hover:shadow-lg"
+                  >
+                    Book Now
+                  </button>
+                  <ToastContainer />
+                </div>
+              ) : available ? (
                 <button
                   onClick={handleBookNow}
                   className="w-full py-3 px-6 bg-green-600 text-white text-lg font-medium rounded-xl transition-all hover:bg-green-700 shadow-md hover:shadow-lg"
