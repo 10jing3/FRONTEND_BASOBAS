@@ -55,6 +55,48 @@ const SingleRoom = () => {
   const [activeTab, setActiveTab] = useState("description");
   const [showToast, setShowToast] = useState(false);
 
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState("");
+  const [rating, setRating] = useState(5); // optional if you want rating
+
+  useEffect(() => {
+    console.log("Fetching reviews for roomId:", roomId);
+    const fetchReviews = async () => {
+      try {
+        const res = await axios.get(`/api/room/getreviews/${roomId}`);
+        console.log("Reviews fetched:", res.data.reviews);
+        setReviews(res.data.reviews);
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
+      }
+    };
+
+    fetchReviews();
+  }, [roomId]);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!newReview.trim()) return;
+
+    try {
+      const res = await axios.post(`/api/room/createreview/${roomId}`, {
+        userId: currentUser._id,
+        comment: newReview,
+        rating,
+      });
+
+      setReviews((prev) => [...prev, res.data.review]);
+      setNewReview("");
+      toast.success("Review posted!");
+    } catch (err) {
+      console.error("Error posting review:", err);
+      if (err.response) {
+        console.error("Server response:", err.response.data);
+      }
+      toast.error("Failed to post review.");
+    }
+  };
+
   useEffect(() => {
     const fetchRoomAndOwner = async () => {
       try {
@@ -262,7 +304,6 @@ const SingleRoom = () => {
         <IoIosArrowBack className="mr-2" />
         Back to results
       </button>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Image Gallery */}
         <div>
@@ -537,6 +578,96 @@ const SingleRoom = () => {
           </div>
         </div>
       </div>
+      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
+        <h3 style={{ textAlign: "center", marginBottom: "20px" }}>Reviews</h3>
+
+        {/* Review Submission Form */}
+        <form onSubmit={handleReviewSubmit} style={{ marginBottom: "20px" }}>
+          <textarea
+            value={newReview}
+            onChange={(e) => setNewReview(e.target.value)}
+            placeholder="Write your review here..."
+            rows="4"
+            style={{
+              width: "100%",
+              padding: "10px",
+              marginBottom: "10px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              fontSize: "14px",
+            }}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "20px",
+            }}
+          >
+            <select
+              value={rating}
+              onChange={(e) => setRating(Number(e.target.value))}
+              style={{
+                padding: "8px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
+                fontSize: "14px",
+              }}
+            >
+              {[5, 4, 3, 2, 1].map((r) => (
+                <option key={r} value={r}>
+                  {r} Star{r > 1 ? "s" : ""}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              style={{
+                padding: "8px 15px",
+                backgroundColor: "#4CAF50",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Submit Review
+            </button>
+          </div>
+        </form>
+
+        {/* Review List */}
+        {reviews.length === 0 ? (
+          <p style={{ textAlign: "center", fontStyle: "italic" }}>
+            No reviews yet.
+          </p>
+        ) : (
+          reviews.map((review, idx) => (
+            <div
+              key={idx}
+              style={{
+                marginBottom: "20px",
+                padding: "15px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 10px",
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                }}
+              >
+                <strong>{review.user?.name || "Anonymous"}</strong> rated{" "}
+                {review.rating}★
+              </p>
+              <p style={{ fontSize: "14px" }}>{review.comment}</p>
+            </div>
+          ))
+        )}
+      </div>
 
       {/* Map Section */}
       {coordinates && (
@@ -565,7 +696,6 @@ const SingleRoom = () => {
           </div>
         </div>
       )}
-
       {/* Payment Modal */}
       {showToast && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
