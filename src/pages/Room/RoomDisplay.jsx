@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { Rotate3D } from "lucide-react";
 import L from "leaflet";
 import {
   FaBed,
@@ -502,19 +503,16 @@ const SingleRoom = () => {
               )}
 
               {vrImages[0] ? (
-                <button
+                <div
                   onClick={handleRoomTour}
-                  className="w-full py-3 px-6 bg-blue-600 text-white text-lg font-medium rounded-xl transition-all hover:bg-blue-700 shadow-md hover:shadow-lg"
+                  className="w-fit p-3 bg-blue-600 text-white rounded-full transition-all hover:bg-blue-700 shadow-md hover:shadow-lg cursor-pointer"
                 >
-                  Take Virtual Tour
-                </button>
+                  <Rotate3D size={32} />
+                </div>
               ) : (
-                <button
-                  disabled
-                  className="w-full py-3 px-6 bg-gray-300 text-white text-lg font-medium rounded-xl cursor-not-allowed shadow"
-                >
-                  Virtual Tour Not Available
-                </button>
+                <div className="w-fit p-3 bg-gray-300 text-white rounded-full shadow cursor-not-allowed">
+                  <Rotate3D size={32} />
+                </div>
               )}
             </div>
           </div>
