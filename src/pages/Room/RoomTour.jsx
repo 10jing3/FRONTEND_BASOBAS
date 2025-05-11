@@ -93,7 +93,7 @@ function RoomTour({ imageUrls }) {
       <div className="w-full h-[700px] flex items-center justify-center bg-gray-900">
         <div className="flex flex-col items-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-400"></div>
-          <p className="text-white/80 text-lg">Loading panoramic view...</p>
+          <p className="text-white/80 text-lg">Loading Virtual Room Tour...</p>
         </div>
       </div>
     );

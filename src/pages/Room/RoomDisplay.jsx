@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Rotate3D } from "lucide-react";
 import L from "leaflet";
+import ReviewSection from "../../components/ReviewSection";
 import {
   FaBed,
   FaBath,
@@ -21,6 +22,7 @@ import {
   FaPhone,
   FaCalendarAlt,
   FaTimes,
+  FaStar, // Import FaStar
 } from "react-icons/fa";
 import {
   MdAcUnit,
@@ -310,11 +312,31 @@ const SingleRoom = () => {
         <div>
           <div className="relative rounded-2xl overflow-hidden shadow-lg bg-gray-100">
             {mainImage ? (
-              <img
-                src={mainImage}
-                alt={name}
-                className="w-full h-[500px] object-cover transition-opacity duration-300"
-              />
+              <div className="relative">
+                <img
+                  src={mainImage}
+                  alt={name}
+                  className="w-full h-[500px] object-cover transition-opacity duration-300"
+                />
+                <div className="absolute top-4 right-4">
+                  {vrImages[0] ? (
+                    <button
+                      onClick={handleRoomTour}
+                      className="inline-flex items-center justify-center p-2 bg-indigo-500 text-neutral-100 rounded-full transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1 shadow-md hover:shadow-lg cursor-pointer"
+                    >
+                      <Rotate3D size={24} />
+                      <span className="sr-only">Virtual Room Tour</span>
+                    </button>
+                  ) : (
+                    <div className="inline-flex items-center justify-center p-2 bg-neutral-300 text-neutral-100 rounded-full shadow cursor-not-allowed">
+                      <Rotate3D size={24} />
+                      <span className="sr-only">
+                        Virtual Room Tour Unavailable
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
             ) : (
               <div className="w-full h-[500px] flex items-center justify-center text-gray-400">
                 No Image Available
@@ -474,7 +496,6 @@ const SingleRoom = () => {
             </div>
 
             {/* Action Buttons */}
-
             <div className="space-y-4">
               {!currentUser ? (
                 <div>
@@ -500,19 +521,6 @@ const SingleRoom = () => {
                 >
                   Currently Unavailable
                 </button>
-              )}
-
-              {vrImages[0] ? (
-                <div
-                  onClick={handleRoomTour}
-                  className="w-fit p-3 bg-blue-600 text-white rounded-full transition-all hover:bg-blue-700 shadow-md hover:shadow-lg cursor-pointer"
-                >
-                  <Rotate3D size={32} />
-                </div>
-              ) : (
-                <div className="w-fit p-3 bg-gray-300 text-white rounded-full shadow cursor-not-allowed">
-                  <Rotate3D size={32} />
-                </div>
               )}
             </div>
           </div>
@@ -575,141 +583,60 @@ const SingleRoom = () => {
             </div>
           </div>
         </div>
-      </div>
-      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
-        <h3 style={{ textAlign: "center", marginBottom: "20px" }}>Reviews</h3>
 
-        {/* Review Submission Form */}
-        <form onSubmit={handleReviewSubmit} style={{ marginBottom: "20px" }}>
-          <textarea
-            value={newReview}
-            onChange={(e) => setNewReview(e.target.value)}
-            placeholder="Write your review here..."
-            rows="4"
-            style={{
-              width: "100%",
-              padding: "10px",
-              marginBottom: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              fontSize: "14px",
-            }}
-          />
+        <ReviewSection
+          reviews={reviews}
+          newReview={newReview}
+          setNewReview={setNewReview}
+          rating={rating}
+          setRating={setRating}
+          handleReviewSubmit={handleReviewSubmit}
+        />
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "20px",
-            }}
-          >
-            <select
-              value={rating}
-              onChange={(e) => setRating(Number(e.target.value))}
-              style={{
-                padding: "8px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-                fontSize: "14px",
-              }}
-            >
-              {[5, 4, 3, 2, 1].map((r) => (
-                <option key={r} value={r}>
-                  {r} Star{r > 1 ? "s" : ""}
-                </option>
-              ))}
-            </select>
-            <button
-              type="submit"
-              style={{
-                padding: "8px 15px",
-                backgroundColor: "#4CAF50",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Submit Review
-            </button>
-          </div>
-        </form>
-
-        {/* Review List */}
-        {reviews.length === 0 ? (
-          <p style={{ textAlign: "center", fontStyle: "italic" }}>
-            No reviews yet.
-          </p>
-        ) : (
-          reviews.map((review, idx) => (
-            <div
-              key={idx}
-              style={{
-                marginBottom: "20px",
-                padding: "15px",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-              }}
-            >
-              <p
-                style={{
-                  margin: "0 0 10px",
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                }}
+        {/* Map Section */}
+        {coordinates && (
+          <div className="bg-white p-6 rounded-2xl shadow-lg mt-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <FaMapMarkerAlt className="inline mr-2 text-green-600" />
+              Location
+            </h2>
+            <div className="h-96 w-full rounded-xl overflow-hidden">
+              <MapContainer
+                center={[coordinates.lat, coordinates.lng]}
+                zoom={15}
+                className="h-full w-full"
               >
-                <strong>{review.user?.name || "Anonymous"}</strong> rated{" "}
-                {review.rating}★
-              </p>
-              <p style={{ fontSize: "14px" }}>{review.comment}</p>
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <Marker
+                  position={[coordinates.lat, coordinates.lng]}
+                  icon={customIcon}
+                >
+                  <Popup className="font-medium">{name}</Popup>
+                </Marker>
+              </MapContainer>
             </div>
-          ))
+          </div>
+        )}
+        {/* Payment Modal */}
+        {showToast && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full relative">
+              <button
+                onClick={handleCancel}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              >
+                <FaTimes className="text-xl" />
+              </button>
+              <div className="p-6">
+                <EsewaPayment amount={price} roomId={roomId} />
+              </div>
+            </div>
+          </div>
         )}
       </div>
-
-      {/* Map Section */}
-      {coordinates && (
-        <div className="bg-white p-6 rounded-2xl shadow-lg mt-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            <FaMapMarkerAlt className="inline mr-2 text-green-600" />
-            Location
-          </h2>
-          <div className="h-96 w-full rounded-xl overflow-hidden">
-            <MapContainer
-              center={[coordinates.lat, coordinates.lng]}
-              zoom={15}
-              className="h-full w-full"
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <Marker
-                position={[coordinates.lat, coordinates.lng]}
-                icon={customIcon}
-              >
-                <Popup className="font-medium">{name}</Popup>
-              </Marker>
-            </MapContainer>
-          </div>
-        </div>
-      )}
-      {/* Payment Modal */}
-      {showToast && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full relative">
-            <button
-              onClick={handleCancel}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <FaTimes className="text-xl" />
-            </button>
-            <div className="p-6">
-              <EsewaPayment amount={price} roomId={roomId} />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
