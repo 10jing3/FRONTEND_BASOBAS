@@ -7,7 +7,10 @@ import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
+import SearchBar from "../components/SearchBar";
 import RoomCard from "../components/RoomCard";
+import PropertyGrid from "../components/PropertyGrid";
+import Testimonials from "../components/Testimonials";
 import {
   FaSearch,
   FaStar,
@@ -17,12 +20,15 @@ import {
 } from "react-icons/fa";
 import { MdOutlineAttachMoney } from "react-icons/md";
 
-// Sample hero image (replace with your actual import)
 import heroImage from "../assets/chitwan.jpg";
 
-const Home = () => {
+const Home = ({ room }) => {
   const navigate = useNavigate();
-  const [search, setSearch] = useState({ location: "", budget: "" });
+  const [search, setSearch] = useState({
+    location: "",
+    budget: "",
+    bedroom: "",
+  });
   const [activeCity, setActiveCity] = useState("All");
 
   // Fetch rooms based on active city filter
@@ -104,6 +110,7 @@ const Home = () => {
     const queryParams = new URLSearchParams();
     if (search.location) queryParams.append("location", search.location);
     if (search.budget) queryParams.append("price", search.budget);
+    if (search.bedroom) queryParams.append("bedroom", search.bedroom);
     navigate(`/search?${queryParams.toString()}`);
   };
 
@@ -130,45 +137,11 @@ const Home = () => {
           </p>
 
           {/* Search Box */}
-          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaMapMarkerAlt className="text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Location (City, Area)"
-                  value={search.location}
-                  onChange={(e) =>
-                    setSearch({ ...search, location: e.target.value })
-                  }
-                  className="pl-10 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-              </div>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MdOutlineAttachMoney className="text-gray-400 text-xl" />
-                </div>
-                <input
-                  type="number"
-                  placeholder="Max Budget"
-                  value={search.budget}
-                  onChange={(e) =>
-                    setSearch({ ...search, budget: e.target.value })
-                  }
-                  className="pl-10 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-              </div>
-              <button
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center"
-                onClick={handleSearch}
-              >
-                <FaSearch className="mr-2" />
-                Search Properties
-              </button>
-            </div>
-          </div>
+          <SearchBar
+            search={search}
+            setSearch={setSearch}
+            onSearch={handleSearch}
+          />
         </div>
       </section>
 
@@ -203,52 +176,14 @@ const Home = () => {
           </div>
 
           {/* Properties Grid */}
-          {isLoading || isRefetching ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-gray-100 rounded-xl overflow-hidden animate-pulse"
-                >
-                  <div className="h-48 bg-gray-200"></div>
-                  <div className="p-4 space-y-3">
-                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : error ? (
-            <div className="text-center py-12 bg-red-50 rounded-lg">
-              <p className="text-red-600">
-                Error loading properties. Please try again later.
-              </p>
-              <button
-                onClick={() => window.location.reload()}
-                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              >
-                Retry
-              </button>
-            </div>
-          ) : (
-            <>
-              {rooms?.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                  {rooms.map((room) => (
-                    <RoomCard key={room._id} room={room} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <p className="text-gray-600">
-                    No properties found in {activeCity}. Try another location.
-                  </p>
-                </div>
-              )}
-            </>
-          )}
+          <PropertyGrid
+            rooms={rooms}
+            isLoading={isLoading}
+            isRefetching={isRefetching}
+            error={error}
+            activeCity={activeCity}
+            onRetry={() => window.location.reload()}
+          />
 
           <div className="text-center mt-10">
             <Link
@@ -262,72 +197,7 @@ const Home = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              What Our Clients Say
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Hear from people who found their perfect home through us
-            </p>
-          </div>
-
-          <Swiper
-            spaceBetween={30}
-            slidesPerView={1}
-            breakpoints={{
-              768: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
-            }}
-            autoplay={{
-              delay: 5000,
-              disableOnInteraction: false,
-            }}
-            pagination={{
-              clickable: true,
-            }}
-            navigation={true}
-            modules={[Autoplay, Pagination, Navigation]}
-            className="pb-12"
-          >
-            {testimonials.map((testimonial) => (
-              <SwiperSlide key={testimonial.id}>
-                <div className="bg-white p-6 rounded-xl h-full shadow-md hover:shadow-lg transition-shadow">
-                  <div className="flex items-center mb-4">
-                    <img
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full object-cover mr-4 border-2 border-green-100"
-                    />
-                    <div>
-                      <h4 className="font-semibold text-gray-800">
-                        {testimonial.name}
-                      </h4>
-                      <div className="flex text-yellow-400">
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar
-                            key={i}
-                            className={
-                              i < testimonial.rating ? "" : "text-gray-300"
-                            }
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <FaQuoteLeft className="text-gray-300 text-xl mb-3" />
-                  <p className="text-gray-700 mb-4">{testimonial.review}</p>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <FaMapMarkerAlt className="mr-1 text-green-600" />
-                    {testimonial.location}
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </section>
+      <Testimonials testimonials={testimonials} />
 
       {/* Features Section */}
       <section className="py-16 bg-white">

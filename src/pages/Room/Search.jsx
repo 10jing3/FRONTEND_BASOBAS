@@ -13,7 +13,7 @@ const Search = () => {
   const [filters, setFilters] = useState({
     location: "",
     priceRange: "",
-    amenities: "",
+    bedroom: "",
   });
 
   useEffect(() => {
@@ -86,18 +86,6 @@ const Search = () => {
               type="text"
               name="priceRange"
               value={filters.priceRange}
-              onChange={handleFilterChange}
-              className="w-full border border-gray-300 rounded-md p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Amenities
-            </label>
-            <input
-              type="text"
-              name="amenities"
-              value={filters.amenities}
               onChange={handleFilterChange}
               className="w-full border border-gray-300 rounded-md p-2"
             />

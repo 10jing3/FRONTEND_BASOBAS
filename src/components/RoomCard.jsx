@@ -44,7 +44,7 @@ const RoomCard = ({ room }) => {
 
         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
           <div className="flex items-center">
-            <FaRupeeSign className="text-green-600" />
+            <span className="text-green-600 text-bold">Rs</span>
             <span className="text-lg font-bold text-green-600 ml-1">
               {price}
             </span>

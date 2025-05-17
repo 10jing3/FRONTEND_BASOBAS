@@ -68,6 +68,7 @@ const RoomEditForm = () => {
     price: "",
     size: "",
     category: "",
+    available: true,
     bedrooms: "",
     bathrooms: "",
     kitchen: "",
@@ -113,6 +114,7 @@ const RoomEditForm = () => {
           price: room.price || "",
           size: room.size || "",
           category: room.category || "",
+          available: room.available || true,
           bedrooms: room.bedrooms || "",
           bathrooms: room.bathrooms || "",
           kitchen: room.kitchen || "",
@@ -342,6 +344,23 @@ const RoomEditForm = () => {
                   <option value="house">House</option>
                 </select>
               </div>
+            </div>
+            <div className="flex items-center mb-4">
+              <input
+                type="checkbox"
+                name="available"
+                checked={formData.available}
+                onChange={(e) =>
+                  setFormData({ ...formData, available: e.target.checked })
+                }
+                className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              />
+              <label
+                htmlFor="available"
+                className="ml-2 block text-sm text-gray-700"
+              >
+                Available for Rent
+              </label>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
