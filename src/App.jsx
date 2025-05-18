@@ -22,6 +22,7 @@ import Failure from "./components/Faliur";
 import Search from "./pages/Room/Search";
 import AddRoom from "./pages/Room/AddRoom";
 import Contact from "./pages/Contact";
+import PasswordReset from "./pages/PasswordReset";
 
 const AppContent = () => {
   const location = useLocation();
@@ -65,6 +66,7 @@ const AppContent = () => {
         <Route path="/success/:roomId" element={<Success />} />
         <Route path="/faliure" element={<Failure />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/reset-password" element={<PasswordReset />} />
       </Routes>
       {!shouldHideFooter && <Footer />}
     </>
