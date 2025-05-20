@@ -2,32 +2,24 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import SearchBar from "../components/SearchBar";
-import RoomCard from "../components/RoomCard";
+
 import PropertyGrid from "../components/PropertyGrid";
 import Testimonials from "../components/Testimonials";
-import {
-  FaSearch,
-  FaStar,
-  FaMapMarkerAlt,
-  FaQuoteLeft,
-  FaArrowRight,
-} from "react-icons/fa";
-import { MdOutlineAttachMoney } from "react-icons/md";
+import { FaArrowRight } from "react-icons/fa";
 
 import heroImage from "../assets/chitwan.jpg";
 
-const Home = ({ room }) => {
+const Home = ({}) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState({
     location: "",
     budget: "",
-    bedroom: "",
+    bedrooms: "",
+    category: "",
   });
   const [activeCity, setActiveCity] = useState("All");
 
@@ -108,9 +100,18 @@ const Home = ({ room }) => {
 
   const handleSearch = () => {
     const queryParams = new URLSearchParams();
+
     if (search.location) queryParams.append("location", search.location);
-    if (search.budget) queryParams.append("price", search.budget);
-    if (search.bedroom) queryParams.append("bedroom", search.bedroom);
+
+    if (search.budget) {
+      const budget = parseInt(search.budget, 10);
+      queryParams.append("minBudget", Math.max(0, budget - 5000));
+      queryParams.append("maxBudget", budget + 5000);
+    }
+
+    if (search.bedrooms) queryParams.append("bedrooms", search.bedrooms);
+    if (search.category) queryParams.append("category", search.category);
+
     navigate(`/search?${queryParams.toString()}`);
   };
 

@@ -290,6 +290,7 @@ const SingleRoom = () => {
     description,
     coordinates,
     bedrooms,
+    category,
     bathrooms,
     size,
     faced,
@@ -373,9 +374,49 @@ const SingleRoom = () => {
           <div className="bg-white p-6 rounded-2xl shadow-lg">
             <div className="mb-6">
               <h1 className="text-3xl font-bold text-gray-900">{name}</h1>
+              {category && (
+                <span className="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full mt-2 mb-1 uppercase tracking-wide">
+                  {category}
+                </span>
+              )}
               <div className="flex items-center text-gray-600 mt-2">
                 <FaMapMarkerAlt className="mr-2 text-green-600" />
                 <span>{location.split(",")[0]}</span>
+              </div>
+              {/* --- Review Summary --- */}
+              <div className="flex items-center gap-2 mt-2">
+                <span className="flex items-center">
+                  {reviews.length > 0 ? (
+                    <>
+                      {[
+                        ...Array(
+                          Math.round(
+                            reviews.reduce(
+                              (acc, r) => acc + (r.rating || 0),
+                              0
+                            ) / reviews.length || 0
+                          )
+                        ),
+                      ].map((_, i) => (
+                        <FaStar key={i} className="text-yellow-400" />
+                      ))}
+                      <span className="ml-2 text-gray-700 font-semibold">
+                        {(
+                          reviews.reduce((acc, r) => acc + (r.rating || 0), 0) /
+                          reviews.length
+                        ).toFixed(1)}
+                      </span>
+                      <span className="ml-2 text-gray-500 text-sm">
+                        ({reviews.length}
+                        {reviews.length > 1 ? "" : ""})
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-gray-400 italic text-sm">
+                      No reviews yet
+                    </span>
+                  )}
+                </span>
               </div>
             </div>
 
@@ -440,61 +481,6 @@ const SingleRoom = () => {
                 {available ? "Available Now" : "Not Available"}
               </span>
             </div>
-
-            {/* Tabs */}
-            <div className="border-b border-gray-200 mb-6">
-              <nav className="flex space-x-8">
-                <button
-                  onClick={() => setActiveTab("description")}
-                  className={`py-3 px-1 font-medium text-sm border-b-2 flex items-center ${
-                    activeTab === "description"
-                      ? "border-green-500 text-green-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <MdOutlineDescription className="mr-2" />
-                  Description
-                </button>
-                <button
-                  onClick={() => setActiveTab("amenities")}
-                  className={`py-3 px-1 font-medium text-sm border-b-2 flex items-center ${
-                    activeTab === "amenities"
-                      ? "border-green-500 text-green-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <MdOutlineMiscellaneousServices className="mr-2" />
-                  Amenities
-                </button>
-              </nav>
-            </div>
-
-            {/* Tab Content */}
-            <div className="min-h-[120px] mb-8">
-              {activeTab === "description" && (
-                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                  {description}
-                </p>
-              )}
-              {activeTab === "amenities" && (
-                <div className="grid grid-cols-2 gap-4">
-                  {amenities.map((amenity, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center bg-gray-50 p-3 rounded-lg"
-                    >
-                      <div className="text-green-600 mr-3">
-                        {renderAmenityIcon(amenity)}
-                      </div>
-                      <span className="text-gray-700 capitalize font-medium">
-                        {amenity}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Action Buttons */}
             <div className="space-y-4">
               {!currentUser ? (
@@ -522,6 +508,59 @@ const SingleRoom = () => {
                   Currently Unavailable
                 </button>
               )}
+              {/* Tabs */}
+              <div className="border-b border-gray-200 mb-6">
+                <nav className="flex space-x-8">
+                  <button
+                    onClick={() => setActiveTab("description")}
+                    className={`py-3 px-1 font-medium text-sm border-b-2 flex items-center ${
+                      activeTab === "description"
+                        ? "border-green-500 text-green-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <MdOutlineDescription className="mr-2" />
+                    Description
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("amenities")}
+                    className={`py-3 px-1 font-medium text-sm border-b-2 flex items-center ${
+                      activeTab === "amenities"
+                        ? "border-green-500 text-green-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <MdOutlineMiscellaneousServices className="mr-2" />
+                    Amenities
+                  </button>
+                </nav>
+              </div>
+
+              {/* Tab Content */}
+              <div className="min-h-[120px] mb-8">
+                {activeTab === "description" && (
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                    {description}
+                  </p>
+                )}
+                {activeTab === "amenities" && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {amenities.map((amenity, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center bg-gray-50 p-3 rounded-lg"
+                      >
+                        <div className="text-green-600 mr-3">
+                          {renderAmenityIcon(amenity)}
+                        </div>
+                        <span className="text-gray-700 capitalize font-medium">
+                          {amenity}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -584,18 +623,9 @@ const SingleRoom = () => {
           </div>
         </div>
 
-        <ReviewSection
-          reviews={reviews}
-          newReview={newReview}
-          setNewReview={setNewReview}
-          rating={rating}
-          setRating={setRating}
-          handleReviewSubmit={handleReviewSubmit}
-        />
-
         {/* Map Section */}
         {coordinates && (
-          <div className="bg-white p-6 rounded-2xl shadow-lg mt-8">
+          <div className="bg-white p-6 rounded-2xl shadow-lg mt-8 w-full">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               <FaMapMarkerAlt className="inline mr-2 text-green-600" />
               Location
@@ -605,6 +635,7 @@ const SingleRoom = () => {
                 center={[coordinates.lat, coordinates.lng]}
                 zoom={15}
                 className="h-full w-full"
+                style={{ width: "100%" }}
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -620,6 +651,18 @@ const SingleRoom = () => {
             </div>
           </div>
         )}
+
+        {/* Review Section - always full width and below the map */}
+        <div className="w-full">
+          <ReviewSection
+            reviews={reviews}
+            newReview={newReview}
+            setNewReview={setNewReview}
+            rating={rating}
+            setRating={setRating}
+            handleReviewSubmit={handleReviewSubmit}
+          />
+        </div>
         {/* Payment Modal */}
         {showToast && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
