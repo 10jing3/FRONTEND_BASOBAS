@@ -14,7 +14,7 @@ export default function MatchRoommates() {
       try {
         const res = await fetch(`/api/match/matchmates/${currentUser._id}`);
         const data = await res.json();
-        setMatches(data);
+        setMatches(data); // matchScore is already calculated in backend
       } catch (err) {
         console.error("Error fetching matches:", err);
       } finally {
@@ -62,9 +62,14 @@ export default function MatchRoommates() {
           />
 
           <div className="p-5">
-            <h2 className="text-2xl font-bold text-gray-800">
-              {currentMatch?.name}
-            </h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-2xl font-bold text-gray-800">
+                {currentMatch?.name}
+              </h2>
+              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+                Match Score: {currentMatch?.matchScore}%
+              </span>
+            </div>
             <p className="text-gray-500 mb-2">{currentMatch?.bio}</p>
 
             <div className="space-y-1 text-sm text-gray-600">
@@ -76,19 +81,25 @@ export default function MatchRoommates() {
                 <strong>Age:</strong> {currentMatch?.age || "Not specified"}
               </p>
               <p>
-                <strong>Budget:</strong> ${currentMatch?.budget}/month
+                <strong>Budget:</strong>{" "}
+                {currentMatch?.budget
+                  ? `Rs ${currentMatch.budget}/month`
+                  : "Not specified"}
               </p>
               <p>
-                <strong>Occupation:</strong>{" "}
-                {currentMatch?.occupation || "Not specified"}
+                <strong>Cleanliness:</strong>{" "}
+                {currentMatch?.cleanliness ?? "Not specified"}
+              </p>
+              <p>
+                <strong>Smoker:</strong> {currentMatch?.isSmoker ? "Yes" : "No"}
+              </p>
+              <p>
+                <strong>Pet Friendly:</strong>{" "}
+                {currentMatch?.isPetFriendly ? "Yes" : "No"}
               </p>
               <p>
                 <strong>Hobbies:</strong>{" "}
                 {currentMatch?.hobbies?.join(", ") || "Not specified"}
-              </p>
-              <p>
-                <strong>Lifestyle:</strong>{" "}
-                {currentMatch?.lifestyle || "Not specified"}
               </p>
             </div>
 

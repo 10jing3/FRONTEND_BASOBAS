@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import RoomCard from "../../components/RoomCard";
 import { FiSearch, FiRefreshCcw } from "react-icons/fi";
 import { FaRegSadTear } from "react-icons/fa";
+import { IoIosArrowBack } from "react-icons/io";
 
 const Search = () => {
   const { search } = useLocation();
@@ -81,12 +82,20 @@ const Search = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-10">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+        >
+          <IoIosArrowBack className="mr-2" />
+          Back to results
+        </button>
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2 tracking-tight">
           Search Results
         </h1>
+
         <div className="flex items-center text-gray-500 text-base">
           <FiSearch className="mr-2 text-xl" />
           <span>{searchQuery || "All available rooms"}</span>

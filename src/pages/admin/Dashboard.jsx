@@ -7,10 +7,10 @@ import RoomForm from "./RoomForm";
 import { useSelector } from "react-redux";
 import RoomMate from "./RoomMate";
 import Booked from "./Booked";
+import { toast } from "react-toastify";
 
 export default function Dashboard() {
   const user = useSelector((state) => state.user.currentUser);
-  console.log("user", user._id);
   const [rooms, setRooms] = useState([]);
   const [activeSection, setActiveSection] = useState("dashboard"); // Track active section
 
@@ -21,6 +21,26 @@ export default function Dashboard() {
   useEffect(() => {
     localStorage.setItem("rooms", JSON.stringify(rooms));
   }, [rooms]);
+
+  // Check for roommate preference and phone before showing RoomMate
+  useEffect(() => {
+    if (activeSection === "RoomMate") {
+      if (
+        !user?.preferredRoommateGender ||
+        !user?.budget ||
+        !user?.cleanliness ||
+        typeof user.isSmoker !== "boolean" ||
+        typeof user.isPetFriendly !== "boolean" ||
+        !user?.phone
+      ) {
+        toast.error(
+          "Please complete your roommate preferences and phone number in your profile before matching.",
+          { position: "top-center", autoClose: 4000 }
+        );
+        setActiveSection("profile");
+      }
+    }
+  }, [activeSection, user]);
 
   const renderSection = () => {
     switch (activeSection) {

@@ -15,7 +15,7 @@ const EsewaPayment = ({ amount, roomId }) => {
     product_delivery_charge: "0",
     product_code: "EPAYTEST",
     success_url: `http://localhost:5173/success/${roomId}/`,
-    Failure_url: "http://localhost:5173/Failure",
+    failure_url: "http://localhost:5173/failure",
     signed_field_names: "total_amount,transaction_uuid,product_code",
     signature: "",
   });
@@ -41,17 +41,17 @@ const EsewaPayment = ({ amount, roomId }) => {
     });
     setFormData((prev) => ({ ...prev, signature: newSignature }));
     // eslint-disable-next-line
-  }, [formData.total_amount, formData.transaction_uuid]);
+  }, [formData.total_amount, formData.transaction_uuid, formData.product_code]);
 
-  // Handle amount change
-  const handleAmountChange = (e) => {
-    const newAmount = e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      amount: newAmount,
-      total_amount: newAmount,
-    }));
-  };
+  // Handle amount change (if you want to allow editing)
+  // const handleAmountChange = (e) => {
+  //   const newAmount = e.target.value;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     amount: newAmount,
+  //     total_amount: newAmount,
+  //   }));
+  // };
 
   return (
     <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 mt-8 border border-green-100">
@@ -83,8 +83,10 @@ const EsewaPayment = ({ amount, roomId }) => {
             id="amount"
             name="amount"
             value={formData.amount}
+            readOnly
             className="w-full border border-gray-200 bg-gray-100 rounded-lg px-4 py-2 text-gray-500 cursor-not-allowed"
             min={1}
+            required
           />
         </div>
         {/* Hidden Fields */}

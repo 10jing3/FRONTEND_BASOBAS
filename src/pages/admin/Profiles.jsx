@@ -31,7 +31,6 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
-  signOut,
 } from "../../redux/user/userSlice";
 import {
   getDownloadURL,
@@ -40,6 +39,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../../firebase";
+import { toast } from "react-toastify";
 
 export default function Profiles() {
   const dispatch = useDispatch();
@@ -94,50 +94,56 @@ export default function Profiles() {
   const saveProfile = async () => {
     try {
       dispatch(updateUserStart());
+      const token = localStorage.getItem("token");
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
         body: JSON.stringify(tempProfile),
       });
       const data = await res.json();
       if (data.success === false) {
         dispatch(updateUserFailure(data));
+        toast.error(data.message || "Failed to update profile");
         return;
       }
-      dispatch(updateUserSuccess(data));
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+      dispatch(updateUserSuccess(data.user));
       setUpdateSuccess(true);
       setEditMode(false);
       setTimeout(() => setUpdateSuccess(false), 3000);
+      toast.success("Profile updated successfully!");
     } catch (error) {
       dispatch(updateUserFailure(error));
+      toast.error("Failed to update profile");
     }
   };
 
   const deleteAccount = async () => {
     try {
       dispatch(deleteUserStart());
+      const token = localStorage.getItem("token");
       const res = await fetch(`/api/user/delete/${currentUser._id}`, {
         method: "DELETE",
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
       });
       const data = await res.json();
       if (data.success === false) {
         dispatch(deleteUserFailure(data));
+        toast.error(data.message || "Failed to delete account");
         return;
       }
       dispatch(deleteUserSuccess(data));
+      toast.success("Account deleted successfully!");
     } catch (error) {
       dispatch(deleteUserFailure(error));
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await fetch("/api/auth/signout");
-      dispatch(signOut());
-    } catch (error) {
-      console.log(error);
+      toast.error("Failed to delete account");
     }
   };
 
@@ -150,14 +156,16 @@ export default function Profiles() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-gray-800">Your Profile</h1>
-        <p className="text-gray-600 mt-2">
-          {editMode
-            ? "Edit your profile details"
-            : "View and manage your profile"}
-        </p>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-800">Your Profile</h1>
+          <p className="text-gray-600 mt-2">
+            {editMode
+              ? "Edit your profile details"
+              : "View and manage your profile"}
+          </p>
+        </div>
       </div>
 
       {/* Profile Picture Section */}
@@ -212,7 +220,7 @@ export default function Profiles() {
         ) : null}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Personal Info Card */}
         <div className="bg-white rounded-xl shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
@@ -312,54 +320,76 @@ export default function Profiles() {
           </div>
 
           <div className="space-y-5">
+            {/* Gender, Budget, Cleanliness, Times, Preferred Gender */}
             {[
               {
                 name: "gender",
                 icon: <FaVenusMars className="text-gray-500" />,
+                label: "Your Gender",
               },
               {
                 name: "budget",
                 icon: <FaMoneyBillWave className="text-gray-500" />,
+                label: "Budget (Rs/month)",
               },
               {
                 name: "cleanliness",
                 icon: <FaBroom className="text-gray-500" />,
+                label: "Cleanliness (1-10)",
               },
               {
                 name: "wakeUpTime",
                 icon: <FaClock className="text-gray-500" />,
+                label: "Wake Up Time",
               },
               {
                 name: "sleepTime",
                 icon: <FaClock className="text-gray-500" />,
+                label: "Sleep Time",
               },
               {
                 name: "preferredRoommateGender",
                 icon: <FaVenusMars className="text-gray-500" />,
+                label: "Preferred Roommate Gender",
               },
-            ].map(({ name, icon }) => (
+            ].map(({ name, icon, label }) => (
               <div key={name} className="space-y-1">
                 <label className="text-sm font-medium text-gray-700">
-                  {name
-                    .replace(/([A-Z])/g, " $1")
-                    .replace(/^./, (str) => str.toUpperCase())}
+                  {label}
                 </label>
                 <div className="flex items-center">
                   <span className="mr-3">{icon}</span>
                   {editMode ? (
-                    <input
-                      type={
-                        name.includes("Time")
-                          ? "time"
-                          : name === "budget" || name === "cleanliness"
-                          ? "number"
-                          : "text"
-                      }
-                      name={name}
-                      value={tempProfile[name] || ""}
-                      onChange={handleChange}
-                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    name === "gender" || name === "preferredRoommateGender" ? (
+                      <select
+                        name={name}
+                        value={tempProfile[name] || ""}
+                        onChange={handleChange}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="">Select</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                        <option value="any">Any</option>
+                      </select>
+                    ) : (
+                      <input
+                        type={
+                          name.includes("Time")
+                            ? "time"
+                            : name === "budget" || name === "cleanliness"
+                            ? "number"
+                            : "text"
+                        }
+                        name={name}
+                        value={tempProfile[name] || ""}
+                        onChange={handleChange}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        min={name === "cleanliness" ? 1 : undefined}
+                        max={name === "cleanliness" ? 10 : undefined}
+                      />
+                    )
                   ) : (
                     <p className="text-gray-800">
                       {currentUser[name] || "Not specified"}
@@ -374,19 +404,19 @@ export default function Profiles() {
               {
                 name: "isSmoker",
                 icon: <FaSmoking className="text-gray-500" />,
+                label: "Smoker",
               },
               {
                 name: "isPetFriendly",
                 icon: <FaPaw className="text-gray-500" />,
+                label: "Pet Friendly",
               },
-            ].map(({ name, icon }) => (
+            ].map(({ name, icon, label }) => (
               <div key={name} className="space-y-1">
                 <div className="flex items-center">
                   <span className="mr-3">{icon}</span>
                   <label className="text-sm font-medium text-gray-700 mr-3">
-                    {name
-                      .replace(/([A-Z])/g, " $1")
-                      .replace(/^./, (str) => str.toUpperCase())}
+                    {label}
                   </label>
                   {editMode ? (
                     <input

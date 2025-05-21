@@ -307,7 +307,6 @@ const RoomEditForm = () => {
               <FaHome className="text-green-600 mr-2" />
               Basic Information
             </h2>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -345,22 +344,35 @@ const RoomEditForm = () => {
                 </select>
               </div>
             </div>
+
             <div className="flex items-center mb-4">
-              <input
-                type="checkbox"
-                name="available"
-                checked={formData.available}
-                onChange={(e) =>
-                  setFormData({ ...formData, available: e.target.checked })
+              <span className="mr-3 text-sm text-gray-700 font-medium">
+                Available for Rent:
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData({ ...formData, available: !formData.available })
                 }
-                className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-              />
-              <label
-                htmlFor="available"
-                className="ml-2 block text-sm text-gray-700"
+                className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+                  formData.available ? "bg-green-500" : "bg-gray-300"
+                }`}
+                aria-pressed={formData.available}
+                aria-label="Toggle availability"
               >
-                Available for Rent
-              </label>
+                <span
+                  className={`inline-block h-6 w-6 transform rounded-full bg-white shadow transition-transform duration-300 ${
+                    formData.available ? "translate-x-7" : "translate-x-1"
+                  }`}
+                />
+              </button>
+              <span
+                className={`ml-3 text-sm font-semibold ${
+                  formData.available ? "text-green-600" : "text-gray-400"
+                }`}
+              >
+                {formData.available ? "Available" : "Not Available"}
+              </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

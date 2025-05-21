@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import About from "./pages/About";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -44,6 +46,7 @@ const AppContent = () => {
 
   return (
     <>
+      <ToastContainer />
       {!shouldHideHeader && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -64,7 +67,7 @@ const AppContent = () => {
           <Route path="/create-room" element={<AddRoom />} />
         </Route>
         <Route path="/success/:roomId" element={<Success />} />
-        <Route path="/faliure" element={<Failure />} />
+        <Route path="/failure" element={<Failure />} />
         <Route path="/search" element={<Search />} />
         <Route path="/reset-password" element={<PasswordReset />} />
       </Routes>
