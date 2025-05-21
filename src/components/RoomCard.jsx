@@ -1,5 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { FaStar } from "react-icons/fa";
+
 import Carousel from "./Carousel";
 import {
   FaMapMarkerAlt,
@@ -12,7 +14,23 @@ import { IoIosArrowForward } from "react-icons/io";
 
 const RoomCard = ({ room }) => {
   const navigate = useNavigate();
-  const { name, price, location, roomImages, bedrooms, bathrooms } = room;
+  const {
+    name,
+    price,
+    location,
+    roomImages,
+    bedrooms,
+    bathrooms,
+    reviews,
+    category,
+  } = room;
+  // Calculate average rating
+  const averageRating =
+    reviews.length > 0
+      ? (
+          reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
+        ).toFixed(1)
+      : null;
 
   return (
     <div className="border rounded-xl shadow-md bg-white overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
@@ -29,6 +47,12 @@ const RoomCard = ({ room }) => {
             <FaMapMarkerAlt className="mr-1 text-gray-400" />
             {location ? location.split(",")[0] : location}
           </div>
+          {/* Category */}
+          {category && (
+            <div className="inline-block mt-2 px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+              {category}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between text-sm text-gray-700">

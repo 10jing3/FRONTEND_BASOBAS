@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import RoomTour from "./RoomTour";
+import RoomTour from "../../components/RoomTour";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 

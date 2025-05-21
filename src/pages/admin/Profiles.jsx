@@ -488,14 +488,6 @@ export default function Profiles() {
         )}
 
         <button
-          onClick={handleSignOut}
-          className="flex items-center px-6 py-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-800 transition-all"
-        >
-          <FaSignOutAlt className="mr-2" />
-          Sign Out
-        </button>
-
-        <button
           onClick={() => setShowDeleteModal(true)}
           className="flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg shadow-md hover:from-red-700 hover:to-red-600 transition-all"
         >

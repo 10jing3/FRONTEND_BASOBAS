@@ -44,7 +44,7 @@ const ReviewSection = ({
                     key={starValue}
                     className={`cursor-pointer transition-colors duration-200 ${
                       starValue <= (rating || hoveredRating)
-                        ? "text-green-500"
+                        ? "text-yellow-400"
                         : "text-gray-300"
                     }`}
                     size={24}
@@ -88,7 +88,7 @@ const ReviewSection = ({
                     {[...Array(review.rating)].map((_, index) => (
                       <FaStar
                         key={index}
-                        className="inline-block text-green-500"
+                        className="inline-block text-yellow-400"
                         size={16}
                       />
                     ))}

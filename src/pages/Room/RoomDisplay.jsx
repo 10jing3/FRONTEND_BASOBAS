@@ -407,14 +407,20 @@ const SingleRoom = () => {
                         ).toFixed(1)}
                       </span>
                       <span className="ml-2 text-gray-500 text-sm">
-                        ({reviews.length}
-                        {reviews.length > 1 ? "" : ""})
+                        ({reviews.length} review
+                        {reviews.length !== 1 ? "s" : ""})
                       </span>
                     </>
                   ) : (
-                    <span className="text-gray-400 italic text-sm">
-                      No reviews yet
-                    </span>
+                    <>
+                      <FaStar className="text-yellow-400" />
+                      <span className="ml-2 text-gray-700 font-semibold">
+                        0.0
+                      </span>
+                      <span className="ml-2 text-gray-500 text-sm">
+                        (0 reviews)
+                      </span>
+                    </>
                   )}
                 </span>
               </div>

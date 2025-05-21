@@ -1,6 +1,14 @@
-import { FaHome, FaUsers, FaBuilding, FaCog, FaDoorOpen } from "react-icons/fa";
+import {
+  FaHome,
+  FaUsers,
+  FaBuilding,
+  FaCog,
+  FaDoorOpen,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import { MdFamilyRestroom, MdDashboard, MdBookOnline } from "react-icons/md";
 import { useDispatch } from "react-redux";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import { signOut } from "../../redux/user/userSlice";
 
@@ -157,6 +165,7 @@ export default function SideNav({ setActiveSection }) {
           onClick={handleSignOut}
           className="w-full flex items-center space-x-3 p-3 text-gray-300 hover:bg-green-700 hover:text-white rounded-lg transition-colors"
         >
+          <FaSignOutAlt className="h-5 w-5" />
           <span>Logout</span>
         </button>
       </div>

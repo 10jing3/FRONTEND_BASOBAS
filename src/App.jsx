@@ -18,7 +18,7 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
 import Success from "./components/Success";
-import Failure from "./components/Faliur";
+import Failure from "./components/Failure";
 import Search from "./pages/Room/Search";
 import AddRoom from "./pages/Room/AddRoom";
 import Contact from "./pages/Contact";

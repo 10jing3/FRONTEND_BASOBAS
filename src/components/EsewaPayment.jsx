@@ -15,7 +15,7 @@ const EsewaPayment = ({ amount, roomId }) => {
     product_delivery_charge: "0",
     product_code: "EPAYTEST",
     success_url: `http://localhost:5173/success/${roomId}/`,
-    failure_url: "http://localhost:5173/failure",
+    Failure_url: "http://localhost:5173/Failure",
     signed_field_names: "total_amount,transaction_uuid,product_code",
     signature: "",
   });
@@ -83,8 +83,6 @@ const EsewaPayment = ({ amount, roomId }) => {
             id="amount"
             name="amount"
             value={formData.amount}
-            readOnly
-            disabled
             className="w-full border border-gray-200 bg-gray-100 rounded-lg px-4 py-2 text-gray-500 cursor-not-allowed"
             min={1}
           />
