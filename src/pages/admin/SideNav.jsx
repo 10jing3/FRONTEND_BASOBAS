@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import { MdFamilyRestroom, MdDashboard, MdBookOnline } from "react-icons/md";
 import { useDispatch } from "react-redux";
+import AdminRoomApproval from "./AdminRoomApproval";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { signOut } from "../../redux/user/userSlice";
@@ -173,6 +174,30 @@ export default function SideNav({ setActiveSection }) {
                 )}
               </button>
             </li>
+          )}
+
+          {/* Admin-only Items */}
+          {isAdminDashboard && (
+            <>
+              <li>
+                <button
+                  onClick={() => setActiveSection("room-approval")}
+                  className={`flex items-center justify-between w-full text-left p-3 rounded-lg transition-colors ${
+                    isActive("room-approval")
+                      ? "bg-green-600 text-white"
+                      : "text-gray-300 hover:bg-green-700 hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <FaBuilding className="h-5 w-5" />
+                    <span>Room Approval</span>
+                  </div>
+                  {isActive("room-approval") && (
+                    <span className="h-2 w-2 rounded-full bg-white"></span>
+                  )}
+                </button>
+              </li>
+            </>
           )}
         </ul>
       </nav>

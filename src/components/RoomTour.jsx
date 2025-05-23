@@ -203,8 +203,60 @@ function RoomTour({ imageUrls }) {
         <FiX className="w-6 h-6" />
       </button>
       {/* Navigation Arrows */}
+      {/* Navigation Arrows */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* ...arrows code unchanged... */}
+        {/* Left Arrow */}
+        {availableDirections.left && (
+          <button
+            onClick={() => navigateView("left")}
+            className="pointer-events-auto absolute top-1/2 left-6 transform -translate-y-1/2 bg-black/60 hover:bg-green-600 text-white p-3 rounded-full transition"
+            aria-label="View Left"
+            type="button"
+            onMouseEnter={() => setHoveredArrow("left")}
+            onMouseLeave={() => setHoveredArrow(null)}
+          >
+            <FiChevronLeft className="w-7 h-7" />
+          </button>
+        )}
+        {/* Right Arrow */}
+        {availableDirections.right && (
+          <button
+            onClick={() => navigateView("right")}
+            className="pointer-events-auto absolute top-1/2 right-6 transform -translate-y-1/2 bg-black/60 hover:bg-green-600 text-white p-3 rounded-full transition"
+            aria-label="View Right"
+            type="button"
+            onMouseEnter={() => setHoveredArrow("right")}
+            onMouseLeave={() => setHoveredArrow(null)}
+          >
+            <FiChevronRight className="w-7 h-7" />
+          </button>
+        )}
+        {/* Forward Arrow */}
+        {availableDirections.forward && (
+          <button
+            onClick={() => navigateView("forward")}
+            className="pointer-events-auto absolute top-10 left-1/2 transform -translate-x-1/2 bg-black/60 hover:bg-green-600 text-white p-3 rounded-full transition"
+            aria-label="View Forward"
+            type="button"
+            onMouseEnter={() => setHoveredArrow("forward")}
+            onMouseLeave={() => setHoveredArrow(null)}
+          >
+            <FiChevronUp className="w-7 h-7" />
+          </button>
+        )}
+        {/* Back Arrow */}
+        {availableDirections.back && (
+          <button
+            onClick={() => navigateView("back")}
+            className="pointer-events-auto absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-black/60 hover:bg-green-600 text-white p-3 rounded-full transition"
+            aria-label="View Back"
+            type="button"
+            onMouseEnter={() => setHoveredArrow("back")}
+            onMouseLeave={() => setHoveredArrow(null)}
+          >
+            <FiChevronDown className="w-7 h-7" />
+          </button>
+        )}
       </div>
       {/* Position Indicator */}
       <div className="absolute bottom-6 left-6 z-10 bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium flex items-center">

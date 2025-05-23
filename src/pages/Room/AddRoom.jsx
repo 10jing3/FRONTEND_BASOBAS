@@ -207,6 +207,10 @@ const AddRoom = () => {
 
       if (response.ok) {
         setMessage({ text: "Room created successfully!", type: "success" });
+        toast.info("Your property will be posted after admin approval.", {
+          position: "top-center",
+          autoClose: 5000,
+        });
         // Reset form
         setFormData({
           name: "",
@@ -227,6 +231,7 @@ const AddRoom = () => {
           owner: user._id,
         });
         setImagePreviews([]);
+        setVrImagePreviews([]);
         setQuery("");
         setSelectedLocation("");
       } else {
@@ -248,6 +253,7 @@ const AddRoom = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <ToastContainer />
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-extrabold text-gray-900">
