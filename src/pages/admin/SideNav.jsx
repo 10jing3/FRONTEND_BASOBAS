@@ -64,7 +64,7 @@ export default function SideNav({ setActiveSection }) {
             >
               <div className="flex items-center space-x-3">
                 <FaDoorOpen className="h-5 w-5" />
-                <span>Rooms</span>
+                <span>Manage Rooms</span>
               </div>
               {isActive("rooms") && (
                 <span className="h-2 w-2 rounded-full bg-white"></span>
@@ -129,6 +129,24 @@ export default function SideNav({ setActiveSection }) {
                     <span>My Bookings</span>
                   </div>
                   {isActive("Booked") && (
+                    <span className="h-2 w-2 rounded-full bg-white"></span>
+                  )}
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => setActiveSection("Booked Rooms")}
+                  className={`flex items-center justify-between w-full text-left p-3 rounded-lg transition-colors ${
+                    isActive("RoomMate")
+                      ? "bg-green-600 text-white"
+                      : "text-gray-300 hover:bg-green-700 hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <MdFamilyRestroom className="h-5 w-5" />
+                    <span>Booked Rooms</span>
+                  </div>
+                  {isActive("RoomMate") && (
                     <span className="h-2 w-2 rounded-full bg-white"></span>
                   )}
                 </button>

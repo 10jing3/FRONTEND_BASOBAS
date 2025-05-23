@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaBed, FaBath, FaMapMarkerAlt, FaMoneyBillWave } from "react-icons/fa";
+import {
+  FaBed,
+  FaBath,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
+  FaWhatsapp,
+} from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 
 const UserBookedRooms = () => {
   const { currentUser } = useSelector((state) => state.user);
-  console.log(currentUser._id);
   const [bookedRooms, setBookedRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!currentUser?._id) return;
     const fetchBookedRooms = async () => {
       try {
         setLoading(true);
@@ -31,7 +37,7 @@ const UserBookedRooms = () => {
     };
 
     fetchBookedRooms();
-  }, [currentUser._id]);
+  }, [currentUser?._id]);
 
   if (loading) {
     return (
@@ -84,19 +90,20 @@ const UserBookedRooms = () => {
                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
                 {/* Room Image */}
-                {room.roomImages?.[0] && (
-                  <div className="h-48 relative">
-                    <img
-                      src={room.roomImages[0]}
-                      alt={room.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src =
-                          "https://via.placeholder.com/400x300?text=No+Image";
-                      }}
-                    />
-                  </div>
-                )}
+                <div className="h-48 relative">
+                  <img
+                    src={
+                      room.roomImages?.[0] ||
+                      "https://via.placeholder.com/400x300?text=No+Image"
+                    }
+                    alt={room.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src =
+                        "https://via.placeholder.com/400x300?text=No+Image";
+                    }}
+                  />
+                </div>
 
                 {/* Room Details */}
                 <div className="p-6">
@@ -106,6 +113,29 @@ const UserBookedRooms = () => {
                   <div className="flex items-center text-gray-600 mb-2">
                     <FaMapMarkerAlt className="mr-2 text-green-600" />
                     <span>{room.location?.split(",")[0]}</span>
+                  </div>
+
+                  {/* Owner Info */}
+                  <div className="mb-2">
+                    <span className="block text-sm text-gray-700">
+                      <span className="font-semibold">Owner:</span>{" "}
+                      {room.owner?.name || room.owner?.username || "N/A"}
+                    </span>
+                    <span className="block text-sm text-gray-700">
+                      <span className="font-semibold">Phone:</span>{" "}
+                      {room.owner?.phone || "N/A"}
+                      {room.owner?.phone && (
+                        <a
+                          href={`https://wa.me/977${room.owner.phone}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-2 inline-flex items-center px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition"
+                          title="Chat on WhatsApp"
+                        >
+                          <FaWhatsapp className="mr-1" /> WhatsApp
+                        </a>
+                      )}
+                    </span>
                   </div>
 
                   {/* Room Specs */}

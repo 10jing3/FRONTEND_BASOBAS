@@ -15,6 +15,7 @@ import {
 import { MdBalcony, MdKitchen } from "react-icons/md";
 import { GiDirectionSigns } from "react-icons/gi";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const LocationInput = ({ query, suggestions, onChange, onSelect }) => (
   <div className="mb-6">
@@ -196,8 +197,10 @@ const RoomEditForm = () => {
       ...imagePreviews,
       ...files.map((file) => URL.createObjectURL(file)),
     ]);
+    console.log("Room images:", newRoomImages);
+    console.log("Image previews:", imagePreviews);
   };
-
+  console.log(imagePreviews);
   const handleVRFileChange = (e) => {
     const files = Array.from(e.target.files);
     const newVRImages = [...formData.vrImages, ...files];
@@ -218,23 +221,52 @@ const RoomEditForm = () => {
     });
   };
 
-  const removeImage = (index, isVR = false) => {
-    if (isVR) {
-      const newVRImages = [...formData.vrImages];
-      newVRImages.splice(index, 1);
-      setFormData({ ...formData, vrImages: newVRImages });
+  const removeImage = async (index, isVR = false) => {
+    try {
+      if (!roomId) {
+        toast.error("Room ID not found.");
+        return;
+      }
 
-      const newVRPreviews = [...vrImagePreviews];
-      newVRPreviews.splice(index, 1);
-      setVrImagePreviews(newVRPreviews);
-    } else {
-      const newRoomImages = [...formData.roomImages];
-      newRoomImages.splice(index, 1);
-      setFormData({ ...formData, roomImages: newRoomImages });
+      // Send DELETE request to backend to remove image by index
+      const response = await fetch(`/api/room/delete-images/${roomId}`, {
+        method: "POST", // or "DELETE" if your backend accepts a body on DELETE
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ indexes: [index] }), // sending index as array
+      });
 
-      const newPreviews = [...imagePreviews];
-      newPreviews.splice(index, 1);
-      setImagePreviews(newPreviews);
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error(result.message || "Failed to delete image.");
+        return;
+      }
+
+      toast.success("Image deleted successfully!");
+
+      // Update frontend state only after success
+      if (isVR) {
+        const newVRImages = [...formData.vrImages];
+        newVRImages.splice(index, 1);
+        setFormData({ ...formData, vrImages: newVRImages });
+
+        const newVRPreviews = [...vrImagePreviews];
+        newVRPreviews.splice(index, 1);
+        setVrImagePreviews(newVRPreviews);
+      } else {
+        const newRoomImages = [...formData.roomImages];
+        newRoomImages.splice(index, 1);
+        setFormData({ ...formData, roomImages: newRoomImages });
+
+        const newPreviews = [...imagePreviews];
+        newPreviews.splice(index, 1);
+        setImagePreviews(newPreviews);
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      toast.error("Something went wrong. Please try again.");
     }
   };
 

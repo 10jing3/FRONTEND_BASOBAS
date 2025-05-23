@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import RoomMate from "./RoomMate";
 import Booked from "./Booked";
 import { toast } from "react-toastify";
+import OwnerRoomsWithBookings from "../../components/OwnerRoomsWithBookings";
 
 export default function Dashboard() {
   const user = useSelector((state) => state.user.currentUser);
@@ -55,6 +56,8 @@ export default function Dashboard() {
         return <RoomMate />;
       case "Booked":
         return <Booked />;
+      case "Booked Rooms":
+        return <OwnerRoomsWithBookings />;
       default:
         return <h2 className="text-xl font-bold"></h2>;
     }
