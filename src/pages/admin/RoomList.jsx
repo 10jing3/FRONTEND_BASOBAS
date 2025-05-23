@@ -147,7 +147,7 @@ export default function RoomList() {
           </p>
           {user?.role !== "admin" && (
             <Link
-              to="/add-room"
+              to="/create-room"
               className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition"
             >
               Create Your First Listing

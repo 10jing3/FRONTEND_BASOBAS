@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   FaUpload,
   FaMapMarkerAlt,
@@ -59,6 +62,20 @@ const LocationInput = ({ query, suggestions, onChange, onSelect }) => (
 
 const AddRoom = () => {
   const user = useSelector((state) => state.user.currentUser);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!user) return;
+    if (!user.phone) {
+      toast.error("Please update your phone number in your profile settings ");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 3000);
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
+  if (!user.phone) return <ToastContainer />;
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
