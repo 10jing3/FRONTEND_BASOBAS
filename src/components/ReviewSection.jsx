@@ -11,9 +11,12 @@ const ReviewSection = ({
   handleReviewSubmit,
 }) => {
   const [hoveredRating, setHoveredRating] = useState(null);
+  const [showAll, setShowAll] = useState(false);
 
   const { currentUser } = useSelector((state) => state.user);
-  console.log("currentUser", currentUser);
+
+  // Only show first 3 reviews unless showAll is true
+  const displayedReviews = showAll ? reviews : reviews.slice(0, 3);
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md">
@@ -75,8 +78,8 @@ const ReviewSection = ({
         {reviews.length === 0 ? (
           <p className="text-gray-500 italic text-center">No reviews yet.</p>
         ) : (
-          reviews.map((review, idx) => {
-            return (
+          <>
+            {displayedReviews.map((review, idx) => (
               <div
                 key={idx}
                 className="mb-4 p-4 border border-gray-200 rounded-md"
@@ -96,8 +99,24 @@ const ReviewSection = ({
                 </p>
                 <p className="text-gray-700 text-sm">{review.comment}</p>
               </div>
-            );
-          })
+            ))}
+            {reviews.length > 3 && !showAll && (
+              <button
+                className="block mx-auto mt-2 text-green-600 hover:underline text-sm"
+                onClick={() => setShowAll(true)}
+              >
+                See All
+              </button>
+            )}
+            {showAll && reviews.length > 3 && (
+              <button
+                className="block mx-auto mt-2 text-green-600 hover:underline text-sm"
+                onClick={() => setShowAll(false)}
+              >
+                Show Less
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -25,6 +25,7 @@ import Search from "./pages/Room/Search";
 import AddRoom from "./pages/Room/AddRoom";
 import Contact from "./pages/Contact";
 import PasswordReset from "./pages/PasswordReset";
+import ScrollToTop from "./components/ScrollToTop";
 
 const AppContent = () => {
   const location = useLocation();
@@ -47,6 +48,7 @@ const AppContent = () => {
   return (
     <>
       <ToastContainer />
+      <ScrollToTop />
       {!shouldHideHeader && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />

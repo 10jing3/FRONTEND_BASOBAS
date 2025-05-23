@@ -7,7 +7,6 @@ import {
   FaSave,
   FaTimes,
   FaTrash,
-  FaSignOutAlt,
   FaUser,
   FaEnvelope,
   FaPhone,
@@ -95,13 +94,30 @@ export default function Profiles() {
     try {
       dispatch(updateUserStart());
       const token = localStorage.getItem("token");
+      // Ensure numeric fields are numbers
+      const profileToSend = {
+        ...tempProfile,
+        budget:
+          tempProfile.budget !== undefined && tempProfile.budget !== ""
+            ? Number(tempProfile.budget)
+            : undefined,
+        cleanliness:
+          tempProfile.cleanliness !== undefined &&
+          tempProfile.cleanliness !== ""
+            ? Number(tempProfile.cleanliness)
+            : undefined,
+        age:
+          tempProfile.age !== undefined && tempProfile.age !== ""
+            ? Number(tempProfile.age)
+            : undefined,
+      };
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify(tempProfile),
+        body: JSON.stringify(profileToSend),
       });
       const data = await res.json();
       if (data.success === false) {
@@ -320,12 +336,17 @@ export default function Profiles() {
           </div>
 
           <div className="space-y-5">
-            {/* Gender, Budget, Cleanliness, Times, Preferred Gender */}
+            {/* Gender, Age, Budget, Cleanliness, Times, Preferred Gender */}
             {[
               {
                 name: "gender",
                 icon: <FaVenusMars className="text-gray-500" />,
                 label: "Your Gender",
+              },
+              {
+                name: "age",
+                icon: <FaUser className="text-gray-500" />,
+                label: "Your Age",
               },
               {
                 name: "budget",
@@ -376,7 +397,9 @@ export default function Profiles() {
                     ) : (
                       <input
                         type={
-                          name.includes("Time")
+                          name === "age"
+                            ? "number"
+                            : name.includes("Time")
                             ? "time"
                             : name === "budget" || name === "cleanliness"
                             ? "number"
@@ -386,8 +409,20 @@ export default function Profiles() {
                         value={tempProfile[name] || ""}
                         onChange={handleChange}
                         className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        min={name === "cleanliness" ? 1 : undefined}
-                        max={name === "cleanliness" ? 10 : undefined}
+                        min={
+                          name === "age"
+                            ? 18
+                            : name === "cleanliness"
+                            ? 1
+                            : undefined
+                        }
+                        max={
+                          name === "age"
+                            ? 100
+                            : name === "cleanliness"
+                            ? 10
+                            : undefined
+                        }
                       />
                     )
                   ) : (

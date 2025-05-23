@@ -8,29 +8,65 @@ export default function MatchRoommates() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [matchingEnabled, setMatchingEnabled] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Fetch matchingEnabled from backend on mount
+  useEffect(() => {
+    const fetchMatchingEnabled = async () => {
+      try {
+        const res = await fetch(
+          `/api/match/matching-enabled/${currentUser._id}`
+        );
+        const data = await res.json();
+        setMatchingEnabled(data.matchingEnabled !== false); // default to true
+      } catch (err) {
+        setMatchingEnabled(true);
+      }
+    };
+    if (currentUser?._id) fetchMatchingEnabled();
+  }, [currentUser]);
 
   useEffect(() => {
+    if (!matchingEnabled) return;
     const fetchMatches = async () => {
       try {
         const res = await fetch(`/api/match/matchmates/${currentUser._id}`);
         const data = await res.json();
-        setMatches(data); // matchScore is already calculated in backend
+        setMatches(data);
       } catch (err) {
         console.error("Error fetching matches:", err);
       } finally {
         setLoading(false);
       }
     };
-
-    if (currentUser?._id) {
-      fetchMatches();
-    }
-  }, [currentUser]);
+    if (currentUser?._id) fetchMatches();
+  }, [currentUser, matchingEnabled]);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex < matches.length - 1 ? prevIndex + 1 : 0
     );
+  };
+
+  // Toggle and save to backend
+  const handleToggle = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(
+        `/api/match/matching-enabled/${currentUser._id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ enabled: !matchingEnabled }),
+        }
+      );
+      const data = await res.json();
+      setMatchingEnabled(data.matchingEnabled);
+    } catch (err) {
+      // Optionally show error
+    }
+    setSaving(false);
   };
 
   const currentMatch = matches[currentIndex];
@@ -40,8 +76,34 @@ export default function MatchRoommates() {
       <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">
         Roommate Match
       </h1>
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={handleToggle}
+          disabled={saving}
+          className={`px-4 py-2 rounded-lg font-medium transition ${
+            matchingEnabled
+              ? "bg-red-500 text-white hover:bg-red-600"
+              : "bg-green-500 text-white hover:bg-green-600"
+          }`}
+        >
+          {saving
+            ? "Saving..."
+            : matchingEnabled
+            ? "Turn Off Roommate Matching"
+            : "Turn On Roommate Matching"}
+        </button>
+      </div>
 
-      {loading ? (
+      {!matchingEnabled ? (
+        <div className="text-center py-12 bg-gray-50 rounded-xl">
+          <h3 className="text-xl font-medium text-gray-700 mb-2">
+            Roommate matching is turned off.
+          </h3>
+          <p className="text-gray-500 max-w-md mx-auto">
+            You can turn it back on anytime using the button above.
+          </p>
+        </div>
+      ) : loading ? (
         <div>Loading...</div>
       ) : matches.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-xl">

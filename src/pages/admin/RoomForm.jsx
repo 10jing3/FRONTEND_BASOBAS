@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import {
-  FaUpload,
   FaMapMarkerAlt,
   FaHome,
   FaMoneyBillWave,
@@ -9,7 +8,6 @@ import {
   FaBed,
   FaBath,
   FaParking,
-  FaUtensils,
 } from "react-icons/fa";
 import { MdBalcony, MdKitchen } from "react-icons/md";
 import { GiDirectionSigns } from "react-icons/gi";

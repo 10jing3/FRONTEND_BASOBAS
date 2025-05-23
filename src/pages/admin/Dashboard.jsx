@@ -28,6 +28,7 @@ export default function Dashboard() {
       if (
         !user?.preferredRoommateGender ||
         !user?.budget ||
+        !user?.age ||
         !user?.cleanliness ||
         typeof user.isSmoker !== "boolean" ||
         typeof user.isPetFriendly !== "boolean" ||
@@ -65,8 +66,8 @@ export default function Dashboard() {
       <SideNav setActiveSection={setActiveSection} />
 
       {/* Main Content */}
-      <div className="ml-64 flex-1 p-5">
-        <main className="mt-4 space-y-8">{renderSection()}</main>
+      <div className="ml-64 flex-1 p-2">
+        <main className=" space-y-8">{renderSection()}</main>
       </div>
     </div>
   );
