@@ -119,7 +119,7 @@ const About = () => {
           <li>Roommate Matching to help you find the ideal companion.</li>
           <li>Interactive maps to locate properties near your area.</li>
           <li>Virtual tours to view homes without leaving yours.</li>
-          <li>Real-time communication between tenants and landlords.</li>
+
           <li>Customizable filters for price, location, and amenities.</li>
         </ul>
       </section>

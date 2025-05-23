@@ -8,6 +8,21 @@ const OwnerRoomsWithBookings = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleRemoveBooking = async (roomId) => {
+    if (!window.confirm("Are you sure you want to remove this booking?"))
+      return;
+    try {
+      await axios.patch(`/api/room/remove-booking/${roomId}`);
+      setRooms((prev) =>
+        prev.map((room) =>
+          room._id === roomId ? { ...room, bookedBy: null } : room
+        )
+      );
+    } catch (err) {
+      alert("Failed to remove booking.");
+    }
+  };
+
   useEffect(() => {
     if (!currentUser?._id) return;
     const fetchRooms = async () => {
@@ -130,6 +145,12 @@ const OwnerRoomsWithBookings = () => {
                         <div className="text-gray-600 text-sm">
                           {room.bookedBy.phone}
                         </div>
+                        <button
+                          onClick={() => handleRemoveBooking(room._id)}
+                          className="mt-2 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition"
+                        >
+                          Remove Booking
+                        </button>
                       </div>
                     </div>
                   ) : (

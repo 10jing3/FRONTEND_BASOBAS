@@ -38,7 +38,7 @@ export default function RoomList() {
       try {
         const endpoint =
           user.role === "admin"
-            ? "/api/room/rooms"
+            ? "/api/room/admin/rooms"
             : `/api/room/get-room-by-owner/${user._id}`;
         const { data } = await axios.get(endpoint);
 
