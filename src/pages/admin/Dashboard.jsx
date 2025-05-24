@@ -9,6 +9,7 @@ import RoomMate from "./RoomMate";
 import Booked from "./Booked";
 import { toast } from "react-toastify";
 import OwnerRoomsWithBookings from "../../components/OwnerRoomsWithBookings";
+import OwnerBookingRequests from "../Room/OwnerBookingRequests";
 
 export default function Dashboard() {
   const user = useSelector((state) => state.user.currentUser);
@@ -56,6 +57,8 @@ export default function Dashboard() {
         return <RoomMate />;
       case "Booked":
         return <Booked />;
+      case "booking request":
+        return <OwnerBookingRequests />;
       case "Booked Rooms":
         return <OwnerRoomsWithBookings />;
       default:

@@ -130,8 +130,28 @@ const SingleRoom = () => {
     }
   }, [room]);
 
-  const handleBookNow = () => {
-    setShowToast(true);
+  const handleBookNow = async () => {
+    if (!currentUser) {
+      toast.error("Log in first to Book Rooms");
+      setTimeout(() => navigate("/sign-up"), 2000);
+      return;
+    }
+
+    try {
+      const res = await axios.post("/api/booking/request", {
+        roomId: room._id,
+        userId: currentUser._id,
+      });
+
+      toast.success(
+        res.data?.message || "Booking request sent! Await owner's approval."
+      );
+    } catch (err) {
+      console.error("Booking error:", err); // Helpful for debugging
+      toast.error(
+        err.response?.data?.message || "Failed to send booking request."
+      );
+    }
   };
   const handleCancel = () => {
     setShowToast(false);

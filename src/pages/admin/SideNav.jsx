@@ -73,6 +73,25 @@ export default function SideNav({ setActiveSection }) {
             </button>
           </li>
 
+          <li>
+            <button
+              onClick={() => setActiveSection("booking request")}
+              className={`flex items-center justify-between w-full text-left p-3 rounded-lg transition-colors ${
+                isActive("booking request")
+                  ? "bg-green-600 text-white"
+                  : "text-gray-300 hover:bg-green-700 hover:text-white"
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <FaDoorOpen className="h-5 w-5" />
+                <span>Booking Request</span>
+              </div>
+              {isActive("booking request") && (
+                <span className="h-2 w-2 rounded-full bg-white"></span>
+              )}
+            </button>
+          </li>
+
           {/* Admin-only Items */}
           {isAdminDashboard && (
             <li>
