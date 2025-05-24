@@ -88,9 +88,11 @@ const AddRoom = () => {
     parking: "",
     balcony: "",
     amenities: [],
+    amenitiesInput: "",
     description: "",
     roomImages: [],
     vrImages: [],
+    documentImages: [],
     coordinates: { lat: null, lng: null },
     owner: user._id,
   });
@@ -98,25 +100,14 @@ const AddRoom = () => {
   const [message, setMessage] = useState({ text: "", type: "" });
   const [imagePreviews, setImagePreviews] = useState([]);
   const [vrImagePreviews, setVrImagePreviews] = useState([]);
+  const [documentPreviews, setDocumentPreviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState("");
 
-  const amenitiesOptions = [
-    "WiFi",
-    "Parking",
-    "Air Conditioning",
-    "TV",
-    "Heating",
-    "Washing Machine",
-    "Elevator",
-    "Gym",
-  ];
-
   const fetchLocations = async (searchText) => {
-    if (searchText.length < 3) return; // Only search after 3 characters
-
+    if (searchText.length < 3) return;
     setIsLoading(true);
     try {
       const response = await axios.get(
@@ -130,6 +121,7 @@ const AddRoom = () => {
       setIsLoading(false);
     }
   };
+
   const handleInputChange = (e) => {
     setQuery(e.target.value);
     fetchLocations(e.target.value);
@@ -171,28 +163,28 @@ const AddRoom = () => {
     setVrImagePreviews(newVRImages.map((file) => URL.createObjectURL(file)));
   };
 
-  const handleAmenityChange = (e) => {
-    const { value, checked } = e.target;
-    setFormData((prevState) => {
-      const updatedAmenities = checked
-        ? [...prevState.amenities, value]
-        : prevState.amenities.filter((amenity) => amenity !== value);
-      return { ...prevState, amenities: updatedAmenities };
-    });
+  const handleDocumentChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newDocuments = [...formData.documentImages, ...files];
+    setFormData({ ...formData, documentImages: newDocuments });
+    setDocumentPreviews(newDocuments.map((file) => URL.createObjectURL(file)));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setMessage({ text: "", type: "" });
-    console.log(formData);
 
     try {
       const data = new FormData();
       Object.keys(formData).forEach((key) => {
         if (key === "coordinates" || key === "amenities") {
           data.append(key, JSON.stringify(formData[key]));
-        } else if (key === "roomImages" || key === "vrImages") {
+        } else if (
+          key === "roomImages" ||
+          key === "vrImages" ||
+          key === "documentImages"
+        ) {
           formData[key].forEach((file) => data.append(key, file));
         } else {
           data.append(key, formData[key]);
@@ -211,7 +203,6 @@ const AddRoom = () => {
           position: "top-center",
           autoClose: 5000,
         });
-        // Reset form
         setFormData({
           name: "",
           price: "",
@@ -224,14 +215,17 @@ const AddRoom = () => {
           parking: "",
           balcony: "",
           amenities: [],
+          amenitiesInput: "",
           description: "",
           roomImages: [],
           vrImages: [],
+          documentImages: [],
           coordinates: { lat: null, lng: null },
           owner: user._id,
         });
         setImagePreviews([]);
         setVrImagePreviews([]);
+        setDocumentPreviews([]);
         setQuery("");
         setSelectedLocation("");
       } else {
@@ -263,7 +257,6 @@ const AddRoom = () => {
             Fill in the details to create your room listing
           </p>
         </div>
-
         <form
           onSubmit={handleSubmit}
           className="bg-white shadow-xl rounded-2xl overflow-hidden p-6 sm:p-8"
@@ -274,7 +267,6 @@ const AddRoom = () => {
               <FaHome className="text-green-600 mr-2" />
               Basic Information
             </h2>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -290,7 +282,6 @@ const AddRoom = () => {
                   placeholder="e.g., Cozy Apartment in Kathmandu"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Category
@@ -306,18 +297,18 @@ const AddRoom = () => {
                   <option value="single room">Single Room</option>
                   <option value="two room">Two Room</option>
                   <option value="2 BHK">2 BHK</option>
+                  <option value="3 BHK">3 BHK</option>
                   <option value="4 BHK">4 BHK</option>
                   <option value="flat">Flat</option>
                   <option value="house">House</option>
                 </select>
               </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <FaMoneyBillWave className="text-green-600 mr-2" />
-                  Price (Rs)
+                  Price (Rs)/Month
                 </label>
                 <div className="relative mt-1 rounded-lg shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -335,7 +326,6 @@ const AddRoom = () => {
                   />
                 </div>
               </div>
-
               <div>
                 <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <FaRuler className="text-green-600 mr-2" />
@@ -354,7 +344,6 @@ const AddRoom = () => {
               </div>
             </div>
           </div>
-
           {/* Location Section */}
           <div className="mb-10">
             <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
@@ -368,13 +357,11 @@ const AddRoom = () => {
               onSelect={handleSelectLocation}
             />
           </div>
-
           {/* Property Details Section */}
           <div className="mb-10">
             <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
               Property Details
             </h2>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div>
                 <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -394,7 +381,6 @@ const AddRoom = () => {
                   <option value="4">4</option>
                 </select>
               </div>
-
               <div>
                 <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <FaBath className="text-green-600 mr-2" />
@@ -412,7 +398,6 @@ const AddRoom = () => {
                   <option value="3">3</option>
                 </select>
               </div>
-
               <div>
                 <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <MdKitchen className="text-green-600 mr-2" />
@@ -431,7 +416,6 @@ const AddRoom = () => {
                   <option value="none">None</option>
                 </select>
               </div>
-
               <div>
                 <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <GiDirectionSigns className="text-green-600 mr-2" />
@@ -450,7 +434,6 @@ const AddRoom = () => {
                   <option value="west">West</option>
                 </select>
               </div>
-
               <div>
                 <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <FaParking className="text-green-600 mr-2" />
@@ -469,7 +452,6 @@ const AddRoom = () => {
                   <option value="open">Open</option>
                 </select>
               </div>
-
               <div>
                 <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <MdBalcony className="text-green-600 mr-2" />
@@ -490,34 +472,33 @@ const AddRoom = () => {
               </div>
             </div>
           </div>
-
           {/* Amenities Section */}
           <div className="mb-10">
             <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
               Amenities
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {amenitiesOptions.map((amenity) => (
-                <div key={amenity} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`amenity-${amenity}`}
-                    value={amenity}
-                    checked={formData.amenities.includes(amenity)}
-                    onChange={handleAmenityChange}
-                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor={`amenity-${amenity}`}
-                    className="ml-2 text-sm text-gray-700"
-                  >
-                    {amenity}
-                  </label>
-                </div>
-              ))}
-            </div>
+            <input
+              type="text"
+              name="amenities"
+              value={formData.amenitiesInput}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  amenitiesInput: e.target.value,
+                  amenities: e.target.value
+                    .split(",")
+                    .map((a) => a.trim())
+                    .filter((a) => a),
+                })
+              }
+              className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+              placeholder="e.g. WiFi, Parking, Air Conditioning"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Separate amenities with commas (e.g. WiFi, Parking, Air
+              Conditioning)
+            </p>
           </div>
-
           {/* Description Section */}
           <div className="mb-10">
             <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
@@ -533,13 +514,11 @@ const AddRoom = () => {
               placeholder="Describe your property in detail..."
             />
           </div>
-
           {/* Images Section */}
           <div className="mb-10">
             <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
               Property Images
             </h2>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -571,7 +550,6 @@ const AddRoom = () => {
                   </div>
                 </div>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Upload VR Tour Images (Optional)
@@ -600,74 +578,130 @@ const AddRoom = () => {
                 </div>
               </div>
             </div>
-
-            {imagePreviews.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Selected Images Preview
-                </label>
-                <div className="flex flex-wrap gap-4">
-                  {imagePreviews.map((preview, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={preview}
-                        alt={`Preview ${index + 1}`}
-                        className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Upload Documents of House (Ownership, Land Deed, etc.)
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                <div className="space-y-1 text-center">
+                  <div className="flex text-sm text-gray-600 justify-center">
+                    <label
+                      htmlFor="documentImages"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none"
+                    >
+                      <span>Upload files</span>
+                      <input
+                        id="documentImages"
+                        name="documentImages"
+                        type="file"
+                        onChange={handleDocumentChange}
+                        multiple
+                        className="sr-only"
                       />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newPreviews = [...imagePreviews];
-                          newPreviews.splice(index, 1);
-                          setImagePreviews(newPreviews);
-                          const newImages = [...formData.roomImages];
-                          newImages.splice(index, 1);
-                          setFormData({ ...formData, roomImages: newImages });
-                        }}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
                 </div>
               </div>
-            )}
-
-            {vrImagePreviews.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Selected Vr Images Preview
-                </label>
-                <div className="flex flex-wrap gap-4">
-                  {vrImagePreviews.map((preview, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={preview}
-                        alt={`Preview ${index + 1}`}
-                        className="w-32 h-32 object-cover rounded-lg border border-gray-200"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newPreviews = [...vrImagePreviews];
-                          newPreviews.splice(index, 1);
-                          setVrImagePreviews(newPreviews);
-                          const newImages = [...formData.vrImages];
-                          newImages.splice(index, 1);
-                          setFormData({ ...formData, vrImages: newImages });
-                        }}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
-
+          {imagePreviews.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Selected Images Preview
+              </label>
+              <div className="flex flex-wrap gap-4">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="relative">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newPreviews = [...imagePreviews];
+                        newPreviews.splice(index, 1);
+                        setImagePreviews(newPreviews);
+                        const newImages = [...formData.roomImages];
+                        newImages.splice(index, 1);
+                        setFormData({ ...formData, roomImages: newImages });
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {vrImagePreviews.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Selected Vr Images Preview
+              </label>
+              <div className="flex flex-wrap gap-4">
+                {vrImagePreviews.map((preview, index) => (
+                  <div key={index} className="relative">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newPreviews = [...vrImagePreviews];
+                        newPreviews.splice(index, 1);
+                        setVrImagePreviews(newPreviews);
+                        const newImages = [...formData.vrImages];
+                        newImages.splice(index, 1);
+                        setFormData({ ...formData, vrImages: newImages });
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {documentPreviews.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Selected Document Preview
+              </label>
+              <div className="flex flex-wrap gap-4">
+                {documentPreviews.map((preview, index) => (
+                  <div key={index} className="relative">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newPreviews = [...documentPreviews];
+                        newPreviews.splice(index, 1);
+                        setDocumentPreviews(newPreviews);
+                        const newImages = [...formData.documentImages];
+                        newImages.splice(index, 1);
+                        setFormData({ ...formData, documentImages: newImages });
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {/* Submit Button */}
           <div className="mt-8">
             <button
@@ -706,7 +740,6 @@ const AddRoom = () => {
               )}
             </button>
           </div>
-
           {message.text && (
             <div
               className={`mt-4 p-4 rounded-lg ${

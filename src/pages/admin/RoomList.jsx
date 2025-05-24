@@ -122,9 +122,14 @@ export default function RoomList() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
-          {user?.role === "admin" ? "All Rooms" : "My Listings"}
-        </h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">
+            {user?.role === "admin" ? "All Rooms" : "My Listings"}
+          </h1>
+          <p className="text-gray-500 mt-1 text-base">
+            Total Rooms: <span className="font-semibold">{rooms.length}</span>
+          </p>
+        </div>
         {user?.role !== "admin" && (
           <Link
             to="/create-room"
@@ -156,11 +161,15 @@ export default function RoomList() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rooms.map((room) => (
+          {rooms.map((room, idx) => (
             <div
               key={room._id}
-              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition"
+              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition relative"
             >
+              {/* Numbering badge */}
+              <div className="absolute z-10 bg-green-600 text-white font-bold rounded-br-xl px-4 py-1 text-lg">
+                {idx + 1}
+              </div>
               <div className="h-48 overflow-hidden">
                 <Carousel images={room.roomImages} />
               </div>

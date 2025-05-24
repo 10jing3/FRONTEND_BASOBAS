@@ -36,7 +36,7 @@ const SearchBar = ({
       {/* Budget */}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <MdOutlineAttachMoney className="text-green-500 text-xl" />
+          <span className="text-green-500 font-bold">RS</span>
         </div>
         <input
           type="number"
@@ -71,7 +71,7 @@ const SearchBar = ({
         <select
           value={search.category || ""}
           onChange={(e) => setSearch({ ...search, category: e.target.value })}
-          className="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-800 bg-white transition"
+          className="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-400 bg-white transition"
         >
           <option value="">Category</option>
           <option value="house">House</option>

@@ -77,6 +77,7 @@ const RoomEditForm = () => {
     parking: "",
     balcony: "",
     amenities: [],
+    amenitiesInput: "", // <-- add this line
     description: "",
     roomImages: [],
     vrImages: [],
@@ -91,17 +92,6 @@ const RoomEditForm = () => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState("");
-
-  const amenitiesOptions = [
-    "WiFi",
-    "Parking",
-    "Air Conditioning",
-    "TV",
-    "Heating",
-    "Washing Machine",
-    "Elevator",
-    "Gym",
-  ];
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -123,6 +113,7 @@ const RoomEditForm = () => {
           parking: room.parking || "",
           balcony: room.balcony || "",
           amenities: room.amenities || [],
+          amenitiesInput: (room.amenities || []).join(", "), // <-- add this line
           description: room.description || "",
           roomImages: [],
           vrImages: [],
@@ -197,8 +188,6 @@ const RoomEditForm = () => {
       ...imagePreviews,
       ...files.map((file) => URL.createObjectURL(file)),
     ]);
-    console.log("Room images:", newRoomImages);
-    console.log("Image previews:", imagePreviews);
   };
   console.log(imagePreviews);
   const handleVRFileChange = (e) => {
@@ -211,16 +200,6 @@ const RoomEditForm = () => {
     ]);
   };
 
-  const handleAmenityChange = (e) => {
-    const { value, checked } = e.target;
-    setFormData((prevState) => {
-      const updatedAmenities = checked
-        ? [...prevState.amenities, value]
-        : prevState.amenities.filter((amenity) => amenity !== value);
-      return { ...prevState, amenities: updatedAmenities };
-    });
-  };
-
   const removeImage = async (index, isVR = false) => {
     try {
       if (!roomId) {
@@ -228,13 +207,16 @@ const RoomEditForm = () => {
         return;
       }
 
-      // Send DELETE request to backend to remove image by index
+      // Send DELETE request to backend to remove image by index and type
       const response = await fetch(`/api/room/delete-images/${roomId}`, {
-        method: "POST", // or "DELETE" if your backend accepts a body on DELETE
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ indexes: [index] }), // sending index as array
+        body: JSON.stringify({
+          indexes: [index],
+          type: isVR ? "vrImages" : "roomImages", // <-- send type
+        }),
       });
 
       const result = await response.json();
@@ -274,6 +256,19 @@ const RoomEditForm = () => {
     e.preventDefault();
     setIsLoading(true);
     setMessage({ text: "", type: "" });
+
+    // Make Room Images compulsory
+    if (
+      (!formData.roomImages || formData.roomImages.length === 0) &&
+      (!imagePreviews || imagePreviews.length === 0)
+    ) {
+      setIsLoading(false);
+      setMessage({
+        text: "Please upload at least one Room Image.",
+        type: "error",
+      });
+      return;
+    }
 
     try {
       const data = new FormData();
@@ -590,26 +585,27 @@ const RoomEditForm = () => {
             <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
               Amenities
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {amenitiesOptions.map((amenity) => (
-                <div key={amenity} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`amenity-${amenity}`}
-                    value={amenity}
-                    checked={formData.amenities.includes(amenity)}
-                    onChange={handleAmenityChange}
-                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor={`amenity-${amenity}`}
-                    className="ml-2 text-sm text-gray-700"
-                  >
-                    {amenity}
-                  </label>
-                </div>
-              ))}
-            </div>
+            <input
+              type="text"
+              name="amenities"
+              value={formData.amenitiesInput}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  amenitiesInput: e.target.value,
+                  amenities: e.target.value
+                    .split(",")
+                    .map((a) => a.trim())
+                    .filter((a) => a),
+                })
+              }
+              className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+              placeholder="e.g. WiFi, Parking, Air Conditioning"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Separate amenities with commas (e.g. WiFi, Parking, Air
+              Conditioning)
+            </p>
           </div>
 
           {/* Description Section */}
