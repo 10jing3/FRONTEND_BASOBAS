@@ -301,6 +301,7 @@ const AddRoom = () => {
                   <option value="4 BHK">4 BHK</option>
                   <option value="flat">Flat</option>
                   <option value="house">House</option>
+                  <option value="others">Others</option>
                 </select>
               </div>
             </div>
@@ -379,6 +380,7 @@ const AddRoom = () => {
                   <option value="2">2</option>
                   <option value="3">3</option>
                   <option value="4">4</option>
+                  <option value="4+">4+</option>
                 </select>
               </div>
               <div>
@@ -395,7 +397,7 @@ const AddRoom = () => {
                   <option value="">Select</option>
                   <option value="1">1</option>
                   <option value="2">2</option>
-                  <option value="3">3</option>
+                  <option value="3">3+</option>
                 </select>
               </div>
               <div>
@@ -448,8 +450,6 @@ const AddRoom = () => {
                   <option value="">Select</option>
                   <option value="yes">Yes</option>
                   <option value="no">No</option>
-                  <option value="covered">Covered</option>
-                  <option value="open">Open</option>
                 </select>
               </div>
               <div>
@@ -466,8 +466,6 @@ const AddRoom = () => {
                   <option value="">Select</option>
                   <option value="yes">Yes</option>
                   <option value="no">No</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
                 </select>
               </div>
             </div>

@@ -31,7 +31,10 @@ const OwnerRoomsWithBookings = () => {
         const response = await axios.get(
           `/api/room/owned/bookings/${currentUser._id}`
         );
-        setRooms(response.data.data);
+        // Filter out deleted rooms (null or undefined)
+        setRooms(
+          (response.data.data || []).filter((room) => !!room && !!room._id)
+        );
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch your rooms");
       } finally {
@@ -78,89 +81,103 @@ const OwnerRoomsWithBookings = () => {
             <h2 className="text-xl font-medium text-gray-500">
               You haven't listed any rooms yet.
             </h2>
+            <p className="mt-2 text-gray-400">
+              Once you add a room, it will appear here along with its booking
+              details.
+            </p>
+            <a
+              href="/create-room"
+              className="inline-block mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg transition"
+            >
+              + Add Your First Room
+            </a>
           </div>
         ) : (
           <div className="space-y-8">
-            {rooms.map((room) => (
-              <div
-                key={room._id}
-                className="bg-white rounded-xl shadow-md p-6 border border-gray-100"
-              >
-                <div className="flex flex-col md:flex-row md:items-center md:space-x-6">
-                  <img
-                    src={
-                      room.roomImages?.[0] ||
-                      "https://via.placeholder.com/200x150?text=No+Image"
-                    }
-                    alt={room.name}
-                    className="w-full md:w-48 h-32 object-cover rounded mb-4 md:mb-0"
-                  />
-                  <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                      {room.name}
-                    </h2>
-                    <div className="text-gray-600 mb-2">{room.category}</div>
-                    <div className="text-gray-500 mb-2">{room.location}</div>
-                    <div className="mb-2">
-                      <span className="font-semibold">Price:</span> Rs{" "}
-                      {room.price?.toLocaleString() || "N/A"}
-                    </div>
-                    <div className="mb-2">
-                      <span className="font-semibold">Size:</span>{" "}
-                      {room.size || "N/A"} sq.ft.
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <h3 className="font-semibold mb-2 text-green-700">
-                    Booked By:
-                  </h3>
-                  {room.bookedBy ? (
-                    <div className="flex items-center bg-green-50 rounded px-3 py-2">
-                      <img
-                        src={
-                          room.bookedBy.profilePicture ||
-                          "https://ui-avatars.com/api/?name=" +
-                            encodeURIComponent(
-                              room.bookedBy.name ||
-                                room.bookedBy.username ||
-                                "User"
-                            )
-                        }
-                        alt={
-                          room.bookedBy.name || room.bookedBy.username || "User"
-                        }
-                        className="w-10 h-10 rounded-full mr-3 border"
-                      />
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {room.bookedBy.name ||
-                            room.bookedBy.username ||
-                            room.bookedBy.email ||
-                            "N/A"}
-                        </div>
-                        <div className="text-gray-600 text-sm">
-                          {room.bookedBy.email}
-                        </div>
-                        <div className="text-gray-600 text-sm">
-                          {room.bookedBy.phone}
-                        </div>
-                        <button
-                          onClick={() => handleRemoveBooking(room._id)}
-                          className="mt-2 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition"
-                        >
-                          Remove Booking
-                        </button>
+            {rooms
+              .filter((room) => !!room && !!room._id) // Filter out deleted rooms
+              .map((room) => (
+                <div
+                  key={room._id}
+                  className="bg-white rounded-xl shadow-md p-6 border border-gray-100"
+                >
+                  <div className="flex flex-col md:flex-row md:items-center md:space-x-6">
+                    <img
+                      src={
+                        room.roomImages?.[0] ||
+                        "https://via.placeholder.com/200x150?text=No+Image"
+                      }
+                      alt={room.name}
+                      className="w-full md:w-48 h-32 object-cover rounded mb-4 md:mb-0"
+                    />
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                        {room.name}
+                      </h2>
+                      <div className="text-gray-600 mb-2">{room.category}</div>
+                      <div className="text-gray-500 mb-2">{room.location}</div>
+                      <div className="mb-2">
+                        <span className="font-semibold">Price:</span> Rs{" "}
+                        {room.price?.toLocaleString() || "N/A"}
+                      </div>
+                      <div className="mb-2">
+                        <span className="font-semibold">Size:</span>{" "}
+                        {room.size || "N/A"} sq.ft.
                       </div>
                     </div>
-                  ) : (
-                    <div className="text-gray-400">
-                      No one has booked this room yet.
-                    </div>
-                  )}
+                  </div>
+                  <div className="mt-4">
+                    <h3 className="font-semibold mb-2 text-green-700">
+                      Booked By:
+                    </h3>
+                    {room.bookedBy ? (
+                      <div className="flex items-center bg-green-50 rounded px-3 py-2">
+                        <img
+                          src={
+                            room.bookedBy.profilePicture ||
+                            "https://ui-avatars.com/api/?name=" +
+                              encodeURIComponent(
+                                room.bookedBy.name ||
+                                  room.bookedBy.username ||
+                                  "User"
+                              )
+                          }
+                          alt={
+                            room.bookedBy.name ||
+                            room.bookedBy.username ||
+                            "User"
+                          }
+                          className="w-10 h-10 rounded-full mr-3 border"
+                        />
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {room.bookedBy.name ||
+                              room.bookedBy.username ||
+                              room.bookedBy.email ||
+                              "N/A"}
+                          </div>
+                          <div className="text-gray-600 text-sm">
+                            {room.bookedBy.email}
+                          </div>
+                          <div className="text-gray-600 text-sm">
+                            {room.bookedBy.phone}
+                          </div>
+                          <button
+                            onClick={() => handleRemoveBooking(room._id)}
+                            className="mt-2 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition"
+                          >
+                            Remove Booking
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-gray-400">
+                        No one has booked this room yet.
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>

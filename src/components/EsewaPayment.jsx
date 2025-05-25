@@ -43,16 +43,6 @@ const EsewaPayment = ({ amount, roomId }) => {
     // eslint-disable-next-line
   }, [formData.total_amount, formData.transaction_uuid, formData.product_code]);
 
-  // Handle amount change (if you want to allow editing)
-  // const handleAmountChange = (e) => {
-  //   const newAmount = e.target.value;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     amount: newAmount,
-  //     total_amount: newAmount,
-  //   }));
-  // };
-
   return (
     <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 mt-8 border border-green-100">
       <div className="flex flex-col items-center mb-6">

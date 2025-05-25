@@ -319,6 +319,9 @@ const SingleRoom = () => {
     amenities = [],
   } = room;
 
+  const isOwner = currentUser && room && currentUser._id === room.owner;
+  const isAdmin = currentUser && currentUser.role === "admin";
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <button
@@ -519,7 +522,7 @@ const SingleRoom = () => {
                   </button>
                   <ToastContainer />
                 </div>
-              ) : available ? (
+              ) : available && !isOwner && !isAdmin ? (
                 <button
                   onClick={handleBookNow}
                   className="w-full py-3 px-6 bg-green-600 text-white text-lg font-medium rounded-xl transition-all hover:bg-green-700 shadow-md hover:shadow-lg"
@@ -531,7 +534,11 @@ const SingleRoom = () => {
                   disabled
                   className="w-full py-3 px-6 bg-gray-300 text-white text-lg font-medium rounded-xl cursor-not-allowed shadow"
                 >
-                  Currently Unavailable
+                  {isOwner
+                    ? "You are the owner"
+                    : isAdmin
+                    ? "Admins cannot book"
+                    : "Currently Unavailable"}
                 </button>
               )}
               {/* Tabs */}
@@ -687,6 +694,7 @@ const SingleRoom = () => {
             rating={rating}
             setRating={setRating}
             handleReviewSubmit={handleReviewSubmit}
+            roomOwnerId={room.owner?._id || room.owner}
           />
         </div>
         {/* Payment Modal */}

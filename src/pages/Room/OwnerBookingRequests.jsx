@@ -135,12 +135,7 @@ const OwnerBookingRequests = () => {
                       <span className="font-semibold">Description:</span>{" "}
                       {req.room?.description}
                     </div>
-                    <div className="mb-2">
-                      <span className="font-semibold">Room ID:</span>{" "}
-                      <span className="text-xs text-gray-500">
-                        {req.room?._id}
-                      </span>
-                    </div>
+
                     {/* User Info */}
                     <div className="flex items-center mt-4 bg-green-50 rounded px-3 py-2">
                       <img
@@ -172,9 +167,6 @@ const OwnerBookingRequests = () => {
                         </div>
                         <div className="text-gray-600 text-sm">
                           Age: {req.user?.age || "N/A"}
-                        </div>
-                        <div className="text-xs text-gray-400">
-                          User ID: {req.user?._id}
                         </div>
                       </div>
                     </div>

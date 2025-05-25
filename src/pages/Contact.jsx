@@ -249,25 +249,6 @@ const Contact = () => {
               </form>
             </div>
           </div>
-
-          {/* Map Section */}
-          <div className="mt-12 bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-green-600">
-              Our Location
-            </h2>
-            <div className="h-96 w-full bg-gray-200 rounded-lg overflow-hidden">
-              {/* Embed Google Map */}
-              <iframe
-                title="BasoBas Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.665325827537!2d-122.4194156846824!3d37.77492997975939!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA%2C%20USA!5e0!3m2!1sen!2snp!4v1620000000000!5m2!1sen!2snp"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-              ></iframe>
-            </div>
-          </div>
         </section>
       </main>
     </div>

@@ -1,4 +1,3 @@
-// Success.jsx
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,8 +10,25 @@ const Success = () => {
   const user = useSelector((state) => state.user.currentUser);
   const [room, setRoom] = useState(null);
 
+  // 1. Mark booking as paid after payment success
   useEffect(() => {
-    // Update room status
+    const markBookingPaid = async () => {
+      try {
+        await fetch("/api/booking/mark-paid", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roomId, userId: user?._id }),
+        });
+      } catch (err) {
+        // Optionally show error or toast
+        // console.error("Failed to update booking payment status:", err);
+      }
+    };
+    if (roomId && user?._id) markBookingPaid();
+  }, [roomId, user]);
+
+  // 2. Update room status (your existing code)
+  useEffect(() => {
     const updateRoomStatus = async () => {
       try {
         await fetch(`/api/room/update-status/${roomId}/${user._id}`, {
@@ -21,19 +37,19 @@ const Success = () => {
           body: JSON.stringify({ available: false }),
         });
       } catch (error) {
-        console.error("Error updating room status:", error);
+        // console.error("Error updating room status:", error);
       }
     };
     if (roomId && user?._id) updateRoomStatus();
   }, [roomId, user]);
 
+  // 3. Fetch room info (your existing code)
   useEffect(() => {
-    // Fetch room info
     const fetchRoom = async () => {
       try {
         const res = await fetch(`/api/room/rooms/${roomId}`);
         const data = await res.json();
-        setRoom(data); // backend returns the room object directly
+        setRoom(data);
       } catch (err) {
         setRoom(null);
       }
