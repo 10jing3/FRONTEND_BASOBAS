@@ -120,10 +120,10 @@ export default function RoomList() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="max-w-5xl mx-auto px-2 py-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-gray-800">
             {user?.role === "admin" ? "All Rooms" : "My Listings"}
           </h1>
           <p className="text-gray-500 mt-1 text-base">
@@ -133,16 +133,16 @@ export default function RoomList() {
         {user?.role !== "admin" && (
           <Link
             to="/create-room"
-            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center"
+            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded transition"
           >
-            + Add New Room
+            + Add Room
           </Link>
         )}
       </div>
 
       {rooms.length === 0 ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center max-w-2xl mx-auto">
-          <h3 className="text-xl font-medium text-gray-700 mb-2">
+        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center shadow">
+          <h3 className="text-lg font-medium text-gray-700 mb-2">
             No rooms available
           </h3>
           <p className="text-gray-500 mb-4">
@@ -153,91 +153,89 @@ export default function RoomList() {
           {user?.role !== "admin" && (
             <Link
               to="/create-room"
-              className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition"
+              className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded transition"
             >
               Create Your First Listing
             </Link>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ul className="space-y-4">
           {rooms.map((room, idx) => (
-            <div
+            <li
               key={room._id}
-              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition relative"
+              className="bg-white rounded-lg shadow flex flex-col md:flex-row md:items-center md:justify-between px-4 py-3 border border-gray-100 hover:border-green-200 transition"
             >
-              {/* Numbering badge */}
-              <div className="absolute z-10 bg-green-600 text-white font-bold rounded-br-xl px-4 py-1 text-lg">
-                {idx + 1}
-              </div>
-              <div className="h-48 overflow-hidden">
-                <Carousel images={room.roomImages} />
-              </div>
-
-              <div className="p-5">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold text-gray-800 truncate">
+              <div className="flex items-center space-x-4 flex-1">
+                <span className="text-green-600 font-bold text-lg w-6 text-center">
+                  {idx + 1}.
+                </span>
+                <div className="w-24 h-16 rounded-lg overflow-hidden border border-gray-200 shadow-sm flex-shrink-0">
+                  <Carousel images={room.roomImages} />
+                </div>
+                <div className="ml-2 flex-1 min-w-0">
+                  <div className="font-bold text-gray-800 truncate">
                     {room.name}
-                  </h3>
-                  <span className="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded">
-                    Rs {room.price}
-                  </span>
-                </div>
-
-                <div className="flex items-center text-gray-600 mb-3">
-                  <FaMapMarkerAlt className="mr-1 text-green-600" />
-                  <span className="truncate">{room.location}</span>
-                </div>
-
-                <div className="flex space-x-4 text-gray-700 mb-4">
-                  <div className="flex items-center">
-                    <FaBed className="mr-1 text-green-600" />
-                    <span>{room.bedrooms || 1}</span>
                   </div>
-                  <div className="flex items-center">
-                    <FaBath className="mr-1 text-green-600" />
-                    <span>{room.bathrooms || 1}</span>
+                  <div className="flex items-center text-gray-500 text-sm mt-1 truncate">
+                    <FaMapMarkerAlt className="mr-1 text-green-500" />
+                    {/* Show only the first word of location */}
+                    {room.location?.split(" ")[0] || ""}
                   </div>
-                  <div className="flex items-center">
-                    <FaRulerCombined className="mr-1 text-green-600" />
-                    <span>{room.size || "N/A"} sq.ft</span>
+                  <div className="flex items-center gap-3 text-xs mt-1 text-gray-400">
+                    <span className="flex items-center">
+                      <FaBed className="mr-1 text-green-400" />{" "}
+                      {room.bedrooms || 1} Bed
+                    </span>
+                    <span className="flex items-center">
+                      <FaBath className="mr-1 text-green-400" />{" "}
+                      {room.bathrooms || 1} Bath
+                    </span>
+                    <span className="flex items-center">
+                      <FaRulerCombined className="mr-1 text-green-400" />{" "}
+                      {room.size || "N/A"} sq.ft
+                    </span>
                   </div>
                 </div>
-
-                <div className="flex justify-between space-x-3">
+              </div>
+              <div className="flex flex-row md:flex-col items-center md:items-end gap-2 mt-3 md:mt-0">
+                <span className="text-green-700 font-semibold text-base">
+                  Rs {room.price}
+                </span>
+                <div className="flex gap-2">
                   <button
                     onClick={() => navigate(`/room/${room._id}`)}
-                    className="flex-1 flex items-center justify-center bg-blue-100 text-blue-700 hover:bg-blue-200 py-2 px-4 rounded-lg transition"
+                    className="flex items-center bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded transition text-sm"
+                    title="View"
                   >
-                    <FaEye className="mr-2" />
-                    View
+                    <FaEye className="mr-1" /> View
                   </button>
                   <button
                     onClick={() => handleEdit(room._id)}
-                    className="flex-1 flex items-center justify-center bg-green-100 text-green-700 hover:bg-green-200 py-2 px-4 rounded-lg transition"
+                    className="flex items-center bg-green-50 text-green-700 hover:bg-green-100 px-3 py-1.5 rounded transition text-sm"
+                    title="Edit"
                   >
-                    <FaEdit className="mr-2" />
-                    Edit
+                    <FaEdit className="mr-1" /> Edit
                   </button>
                   <button
                     onClick={() => handleDelete(room._id, room.name)}
-                    className="flex-1 flex items-center justify-center bg-red-100 text-red-700 hover:bg-red-200 py-2 px-4 rounded-lg transition"
+                    className="flex items-center bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded transition text-sm"
+                    title="Delete"
                   >
-                    <FaTrash className="mr-2" />
-                    Delete
+                    <FaTrash className="mr-1" /> Delete
                   </button>
                 </div>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       {/* Delete Confirmation Modal */}
       {deleteModal.isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
+            <h3 className="text-lg font-bold text-gray-800 mb-2">
               Confirm Deletion
             </h3>
             <p className="text-gray-600 mb-6">
