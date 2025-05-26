@@ -37,7 +37,7 @@ const Success = () => {
           body: JSON.stringify({ available: false }),
         });
       } catch (error) {
-        // console.error("Error updating room status:", error);
+        console.error("Error updating room status:", error);
       }
     };
     if (roomId && user?._id) updateRoomStatus();

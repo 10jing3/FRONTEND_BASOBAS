@@ -9,12 +9,16 @@ import RoomMate from "./RoomMate";
 import Booked from "./Booked";
 import { toast } from "react-toastify";
 import OwnerRoomsWithBookings from "../../components/OwnerRoomsWithBookings";
+import { useLocation } from "react-router-dom";
 import OwnerBookingRequests from "../Room/OwnerBookingRequests";
 
 export default function Dashboard() {
+  const location = useLocation();
   const user = useSelector((state) => state.user.currentUser);
   const [rooms, setRooms] = useState([]);
-  const [activeSection, setActiveSection] = useState("dashboard"); // Track active section
+  const [activeSection, setActiveSection] = useState(
+    location.state?.section || "dashboard"
+  ); // Default to "dashboard" if no section is provided
 
   useEffect(() => {
     const savedRooms = JSON.parse(localStorage.getItem("rooms")) || [];
@@ -23,6 +27,12 @@ export default function Dashboard() {
   useEffect(() => {
     localStorage.setItem("rooms", JSON.stringify(rooms));
   }, [rooms]);
+  useEffect(() => {
+    if (location.state?.section) {
+      setActiveSection(location.state.section);
+    }
+    // eslint-disable-next-line
+  }, [location.state]);
 
   // Check for roommate preference and phone before showing RoomMate
   useEffect(() => {

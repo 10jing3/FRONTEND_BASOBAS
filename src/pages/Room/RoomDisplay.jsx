@@ -143,11 +143,18 @@ const SingleRoom = () => {
         userId: currentUser._id,
       });
 
-      toast.success(
-        res.data?.message || "Booking request sent! Await owner's approval."
-      );
+      // Check if booking is accepted
+      if (res.data?.booking?.status === "accepted") {
+        toast.success(
+          "Your booking has been accepted! Please go to 'My Bookings' in your dashboard for further process."
+        );
+      } else {
+        toast.success(
+          res.data?.message || "Booking request sent! Await owner's approval."
+        );
+      }
     } catch (err) {
-      console.error("Booking error:", err); // Helpful for debugging
+      console.error("Booking error:", err);
       toast.error(
         err.response?.data?.message || "Failed to send booking request."
       );
